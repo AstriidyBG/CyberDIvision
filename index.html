@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Proteção de Referrer para não vazar a origem do webhook -->
     <meta name="referrer" content="no-referrer">
-    <title>CYBER DIVISION // VHS_RECRUIT</title>
+    <title>CYBER DIVISION // REGISTRO_AGENTE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -19,7 +18,6 @@
             --gray-metal: #121212;
         }
 
-        /* Bloqueio de seleção de texto para evitar cópias */
         * {
             user-select: none;
             -webkit-user-select: none;
@@ -32,46 +30,37 @@
             font-family: 'JetBrains Mono', monospace;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
-            transition: background-color 1s ease;
         }
 
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
 
-        /* --- EFEITOS VHS E CRT --- */
+        /* --- EFEITOS VISUAIS --- */
         .vhs-noise {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1001; pointer-events: none;
             background: url('https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Static_Noise_Grains.gif');
-            opacity: 0.05; mix-blend-mode: screen;
+            opacity: 0.04; mix-blend-mode: screen;
         }
 
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
             background-size: 100% 4px;
             z-index: 1000; pointer-events: none;
         }
 
-        .crt-flicker {
-            animation: flicker 0.1s infinite;
-        }
-        @keyframes flicker {
-            0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; }
-        }
-
-        /* --- COMPONENTES CYBER --- */
         .cyber-panel {
             background: var(--gray-metal);
             border: 2px solid #222;
             position: relative;
-            box-shadow: inset 0 0 30px rgba(0,0,0,1), 0 0 20px rgba(255,0,0,0.05);
+            box-shadow: inset 0 0 30px rgba(0,0,0,1);
         }
 
         .cyber-panel::before {
-            content: "DATA_STATION_097";
+            content: "SECURE_TERMINAL_v4.0";
             position: absolute; top: -12px; left: 15px;
             background: var(--red-main); color: black;
-            font-size: 9px; padding: 2px 8px; font-weight: 900;
+            font-size: 8px; padding: 2px 8px; font-weight: 900;
         }
 
         .cyber-btn {
@@ -87,557 +76,384 @@
         .cyber-btn:hover {
             background: var(--red-main);
             color: #000;
-            box-shadow: 0 0 25px var(--red-main);
-            text-shadow: none;
+            box-shadow: 0 0 20px var(--red-main);
         }
 
         .rec-dot {
-            width: 12px; height: 12px; background: var(--red-main);
+            width: 10px; height: 10px; background: var(--red-main);
             border-radius: 50%; display: inline-block;
             box-shadow: 0 0 10px var(--red-main);
             animation: blink 1s infinite;
         }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        input, select, textarea {
-            background: #080808 !important;
+        /* --- INPUTS --- */
+        .cyber-input {
+            background: #0a0a0a !important;
             border: 1px solid #333 !important;
-            color: #ff0000 !important;
-            padding: 14px !important;
+            color: #ffffff !important;
+            padding: 16px !important;
             width: 100%;
-            font-size: 14px !important;
+            font-size: 13px !important;
             text-transform: uppercase;
             border-radius: 0 !important;
-            user-select: text !important; /* Permite digitar */
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+        .cyber-input:focus {
+            border-color: var(--red-main) !important;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255,0,0,0.1);
         }
 
         .step-container { display: none; }
-        .step-container.active { display: block; }
-
-        .corner { position: absolute; width: 20px; height: 20px; border-color: var(--red-main); pointer-events: none; }
-        .t-l { top: -2px; left: -2px; border-top: 4px solid; border-left: 4px solid; }
-        .t-r { top: -2px; right: -2px; border-top: 4px solid; border-right: 4px solid; }
-        .b-l { bottom: -2px; left: -2px; border-bottom: 4px solid; border-left: 4px solid; }
-        .b-r { bottom: -2px; right: -2px; border-bottom: 4px solid; border-right: 4px solid; }
+        .step-container.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .mission-card {
             position: relative;
-            background: rgba(10, 10, 10, 0.6);
+            background: rgba(15, 15, 15, 0.8);
             border: 1px solid #222;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
-        
-        .mission-card::before {
-            content: '';
-            position: absolute;
-            top: -100%; left: 0; width: 100%; height: 50%;
-            background: linear-gradient(to bottom, transparent, rgba(255,0,0,0.2), transparent);
-            animation: scan-card 2.5s linear infinite;
-            pointer-events: none;
-            opacity: 0.3;
-        }
-
-        @keyframes scan-card { 0% { top: -100%; } 100% { top: 200%; } }
-
         .mission-card.selected {
-            border-color: rgba(255,0,0,0.6);
-            animation: cyber-pulse 2s infinite;
-            background: rgba(255,0,0,0.1);
+            border-color: var(--red-main);
+            background: rgba(255, 0, 0, 0.05);
         }
 
-        @keyframes cyber-pulse {
-            0% { box-shadow: 0 0 5px rgba(255,0,0,0.1); }
-            50% { box-shadow: 0 0 15px rgba(255,0,0,0.4); }
-            100% { box-shadow: 0 0 5px rgba(255,0,0,0.1); }
-        }
-
-        .card-corner { position: absolute; width: 12px; height: 12px; pointer-events: none; border-color: #27272a; }
-        .card-corner.t-l { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; }
-        .card-corner.t-r { top: 0; right: 0; border-top: 2px solid; border-right: 2px solid; }
-        .card-corner.b-l { bottom: 0; left: 0; border-bottom: 2px solid; border-left: 2px solid; }
-        .card-corner.b-r { bottom: 0; right: 0; border-bottom: 2px solid; border-right: 2px solid; }
-
-        .oath-box {
-            border: 1px solid #333;
-            background: #000;
-            padding: 20px;
-            position: relative;
-        }
-        .oath-box::after {
-            content: "JURAMENTO_OBRIGATÓRIO";
-            position: absolute; bottom: -8px; right: 10px;
-            background: #ff0000; color: black; font-size: 8px; font-weight: 900; padding: 1px 5px;
-        }
-
-        .glitch-text {
-            animation: glitch 1s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch {
-          0% { text-shadow: 1px 0 0 #ff0000, -1px 0 0 #00ffff; }
-          100% { text-shadow: -1px 0 0 #ff0000, 1px 0 0 #00ffff; }
-        }
-
-        /* --- SHUTDOWN ANIMATION --- */
-        .shutdown-effect {
-            animation: shutdown 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-        @keyframes shutdown {
-            0% { transform: scaleY(1); opacity: 1; }
-            40% { transform: scaleY(0.01) scaleX(1); opacity: 1; }
-            100% { transform: scaleY(0) scaleX(0); opacity: 0; }
-        }
+        .shutdown-effect { animation: shutdown 0.5s forwards; }
+        @keyframes shutdown { 100% { transform: scaleY(0); opacity: 0; } }
 
         #shutdown-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: black;
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            color: #222;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.5em;
-            text-align: center;
+            display: none; position: fixed; inset: 0; background: black; z-index: 9999;
+            align-items: center; justify-content: center; color: #1a1a1a;
         }
     </style>
 </head>
-<body class="crt-flicker" id="main-body" oncontextmenu="return false;">
+<body oncontextmenu="return false;">
     <div class="vhs-noise"></div>
     <div class="scanlines"></div>
 
-    <!-- TELA DE DESLIGAMENTO -->
-    <div id="shutdown-screen">
-        <div>
-            <div class="mb-4 text-zinc-900">NO SIGNAL</div>
-            <div class="text-[10px] text-zinc-950">CONNECTION_TERMINATED_BY_HOST</div>
-        </div>
-    </div>
+    <div id="shutdown-screen" class="font-orbitron">SYSTEM_OFFLINE</div>
 
-    <header id="app-header" class="fixed top-0 w-full p-8 flex justify-between items-start z-50 pointer-events-none">
+    <header id="app-header" class="fixed top-0 w-full p-6 flex justify-between items-start z-50 pointer-events-none">
         <div class="flex flex-col">
-            <div class="flex items-center text-red-600 font-black italic text-2xl tracking-tighter">
-                <span class="rec-dot mr-3"></span> PLAY 
+            <div class="flex items-center text-red-600 font-black italic text-xl">
+                <span class="rec-dot mr-2"></span> REC_START
             </div>
-            <div class="text-[11px] text-zinc-500 font-mono mt-1 font-bold">VCR MODE: RECRUITMENT</div>
+            <div class="text-[9px] text-zinc-600 font-bold uppercase mt-1">Status: Recrutamento Ativo</div>
         </div>
-        <div class="text-right font-mono">
-            <div id="vhs-date" class="text-zinc-400 text-xs tracking-widest">--- -- ----</div>
-            <div id="clock" class="text-2xl font-black text-white">00:00:00</div>
+        <div class="text-right">
+            <div id="vhs-date" class="text-zinc-500 text-[10px] tracking-tighter">--- -- ----</div>
+            <div id="clock" class="text-xl font-black text-white">00:00:00</div>
         </div>
     </header>
 
-    <main id="app-content" class="min-h-screen flex items-center justify-center p-4 py-32">
+    <main id="app-content" class="min-h-screen flex items-center justify-center p-4 py-24">
         <div class="w-full max-w-xl">
             
-            <!-- ETAPA 0: INÍCIO -->
+            <!-- ETAPA 0: INTRO -->
             <section id="step-0" class="step-container active">
-                <div class="text-center mb-12">
-                    <h1 class="font-orbitron text-6xl md:text-8xl font-black text-white italic tracking-tighter mb-4">
-                        CYber<span class="text-red-600">DIvision</span>
+                <div class="text-center mb-8">
+                    <h1 class="font-orbitron text-5xl md:text-7xl font-black text-white italic tracking-tighter">
+                        VOID<span class="text-red-600">_REG</span>
                     </h1>
-                    <div class="inline-block bg-red-600 text-black px-4 py-1 text-[10px] font-black uppercase tracking-[0.4em]">
-                        Formulario de entrada
-                    </div>
                 </div>
 
-                <div class="cyber-panel p-10 mb-10 border-l-8 border-l-red-600">
-                    <div class="t-l corner"></div><div class="t-r corner"></div><div class="b-l corner"></div><div class="b-r corner"></div>
-                    <h2 class="text-red-600 font-black mb-4 flex items-center gap-3 text-lg">
-                        <i data-lucide="shield-alert" class="w-6 h-6"></i>
-                        DIRETRIZ DE ENTRADA
+                <div class="cyber-panel p-8 mb-8 border-l-4 border-l-red-600">
+                    <h2 class="text-red-600 font-black mb-3 flex items-center gap-2 text-sm uppercase">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        Aviso de Segurança
                     </h2>
-                    <p class="text-zinc-300 text-xs leading-loose uppercase font-bold">
-                        A <span class="text-white underline">CYBER DIVISION</span> REQUER DADOS PRECISOS. 
-                        ESTA FICHA SERÁ PROCESSADA PARA OS NOSSOS SERVIDORES ENCRIPTADOS. 
+                    <p class="text-zinc-400 text-[11px] leading-relaxed uppercase font-bold">
+                        Você está prestes a entrar para a <span class="text-white">CYBER DIVISION</span>. 
+                        Preencha sua ficha de agente com honestidade. Dados falsos levam à exclusão.
                     </p>
                 </div>
 
-                <button class="cyber-btn w-full py-8 text-lg italic tracking-[0.5em]" onclick="app.setStep(1)">
-                    [ INICIAR_GRAVAÇÃO ]
+                <button class="cyber-btn w-full py-6 text-md italic tracking-[0.3em]" onclick="app.setStep(1)">
+                    [ ABRIR_FICHA ]
                 </button>
             </section>
 
-            <!-- ETAPA 1: SELEÇÃO DE MISSÃO E ARQUIVOS -->
+            <!-- ETAPA 1: DADOS PESSOAIS -->
             <section id="step-1" class="step-container">
-                <div class="mb-8 flex items-center gap-6">
-                    <span class="text-red-600 font-black italic tracking-widest text-sm">PROTOCOLO_MISSÃO</span>
+                <div class="mb-6 flex items-center gap-4">
+                    <span class="text-red-600 font-black italic text-xs uppercase tracking-widest">01. Identificação</span>
                     <div class="h-[1px] flex-1 bg-zinc-800"></div>
                 </div>
 
-                <div class="cyber-panel p-8 space-y-8">
-                    <div class="space-y-4">
-                        <label class="text-[10px] font-black text-red-600 tracking-[0.3em] uppercase flex items-center gap-2">
-                            <i data-lucide="crosshair" class="w-4 h-4"></i>
-                            Escolha sua Operação de Teste
-                        </label>
-                        <p class="text-[10px] text-zinc-500 font-bold leading-relaxed border-l-2 border-red-900/50 pl-3">
-                            SELECIONE O TIPO DE OPERAÇÃO QUE VOCÊ ESTÁ REALIZANDO. ESSA ESCOLHA DEVE SER COMPATÍVEL COM OS PRINTS/PROVAS QUE VOCÊ IRÁ ANEXAR ABAIXO.
-                        </p>
-                        <div id="mission-grid" class="grid grid-cols-2 gap-4"></div>
+                <div class="cyber-panel p-6 space-y-5">
+                    <div>
+                        <label class="text-[9px] font-black text-zinc-500 uppercase mb-2 block tracking-widest">Nome Completo</label>
+                        <input type="text" id="reg-name" class="cyber-input" placeholder="Ex: Lucas Silva Santos">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[9px] font-black text-zinc-500 uppercase mb-2 block tracking-widest">Idade</label>
+                            <input type="number" id="reg-age" class="cyber-input" placeholder="18">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-zinc-500 uppercase mb-2 block tracking-widest">Codinome / Nick</label>
+                            <input type="text" id="reg-nick" class="cyber-input" placeholder="Ex: Ghost_99">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black text-zinc-500 uppercase mb-2 block tracking-widest">Especialidade (O que você faz de melhor?)</label>
+                        <textarea id="reg-skills" class="cyber-input h-24 resize-none" placeholder="Ex: Invasão de sistemas, Reconhecimento de campo..."></textarea>
                     </div>
 
-                    <div id="drop-zone" class="border-2 border-dashed border-red-900/40 p-12 text-center bg-black/80 hover:border-red-600 transition-all cursor-pointer group">
-                        <input type="file" id="file-input" multiple accept="image/*" class="hidden">
-                        <i data-lucide="upload-cloud" class="w-10 h-10 mx-auto mb-4 text-red-900 group-hover:text-red-600 transition-colors"></i>
-                        <p class="text-[10px] font-black text-zinc-500 tracking-[0.2em] uppercase">Carregar Provas / Prints (Máx 6)</p>
-                        <p class="text-[8px] text-zinc-600 mt-2">MÁX. 8MB POR ARQUIVO</p>
-                    </div>
-
-                    <div id="file-previews" class="grid grid-cols-2 gap-3"></div>
-
-                    <div class="flex gap-4">
-                        <button class="px-8 py-5 border border-zinc-800 text-zinc-600 text-[11px] font-bold hover:text-white transition-colors" onclick="app.setStep(0)">VOLTAR</button>
-                        <button class="cyber-btn flex-1 py-5 text-md italic tracking-widest" onclick="app.checkStep1()">PROSSEGUIR JURAMENTO</button>
-                    </div>
+                    <button class="cyber-btn w-full py-5 text-sm" onclick="app.validateStep1()">PRÓXIMA FASE: PROTOCOLO</button>
                 </div>
             </section>
 
-            <!-- ETAPA 2: O JURAMENTO -->
+            <!-- ETAPA 2: MISSÃO -->
             <section id="step-2" class="step-container">
-                <div class="mb-8 flex items-center gap-6">
-                    <span class="text-red-600 font-black italic tracking-widest text-sm">JURAMENTO_LEALDADE</span>
+                <div class="mb-6 flex items-center gap-4">
+                    <span class="text-red-600 font-black italic text-xs uppercase tracking-widest">02. Protocolo de Missão</span>
                     <div class="h-[1px] flex-1 bg-zinc-800"></div>
                 </div>
 
-                <div class="cyber-panel p-8 space-y-8">
-                    <div class="oath-box">
-                        <p class="text-white text-[10px] font-bold uppercase leading-relaxed mb-4">
-                            PARA PROVAR SUA LEALDADE À TAG E À DIVISÃO, VOCÊ DEVE REALIZAR O JURAMENTO FÍSICO.
-                        </p>
-                        <div class="bg-red-600/10 border-l-4 border-red-600 p-4 mb-4">
-                            <h4 class="text-red-600 font-black text-xs mb-2">INSTRUÇÕES DE MARCAÇÃO:</h4>
-                            <p class="text-[10px] text-zinc-400 font-bold uppercase">
-                                1. Use uma caneta hidrográfica (ou similar).<br>
-                                2. Escreva <span class="text-white">"ECLIPSE"</span> e, logo abaixo, <span class="text-white">"CsL"</span>.<br>
-                                3. Local permitido: <span class="text-red-400">PESCOÇO, PERNA ou BARRIGA</span>.
-                            </p>
+                <div class="cyber-panel p-6 space-y-6">
+                    <div id="mission-grid" class="space-y-3"></div>
+
+                    <div class="space-y-3">
+                        <label class="text-[9px] font-black text-red-600 uppercase tracking-widest">Provas Visuais (Prints da Missão)</label>
+                        <div id="drop-zone" class="border-2 border-dashed border-zinc-800 p-8 text-center bg-black/40 hover:border-red-600 cursor-pointer transition-all">
+                            <input type="file" id="file-input" multiple accept="image/*" class="hidden">
+                            <i data-lucide="camera" class="w-6 h-6 mx-auto mb-2 text-zinc-700"></i>
+                            <p class="text-[9px] font-bold text-zinc-500 uppercase">Tire foto ou anexe da galeria (Máx 6)</p>
                         </div>
-                        <p class="text-[9px] text-zinc-500 italic uppercase">
-                            Nota: Estas fotos são para fins de validação e serão destruídas permanentemente em 1 hora após a recepção. Este processo é obrigatório para entrada na divisão.
-                        </p>
+                        <div id="file-previews" class="grid grid-cols-3 gap-2"></div>
                     </div>
 
-                    <div id="oath-zone" class="border-2 border-dashed border-red-600/40 p-10 text-center bg-red-600/5 hover:border-red-600 transition-all cursor-pointer group">
-                        <input type="file" id="oath-input" class="hidden" accept="image/*">
-                        <i data-lucide="camera" class="w-8 h-8 mx-auto mb-3 text-red-600"></i>
-                        <p class="text-[10px] font-black text-red-600 tracking-[0.2em] uppercase">Anexar Foto do Juramento</p>
-                    </div>
-                    
-                    <div id="oath-preview" class="hidden">
-                        <div class="p-3 border border-red-600 bg-red-600/20 text-[9px] flex justify-between items-center text-white font-bold">
-                            <span id="oath-filename" class="truncate pr-2">ARQUIVO_CARREGADO.JPG</span>
-                            <i data-lucide="check-circle" class="w-4 h-4 text-green-500 flex-shrink-0"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4">
-                        <button class="px-8 py-5 border border-zinc-800 text-zinc-600 text-[11px] font-bold hover:text-white transition-colors" onclick="app.setStep(1)">CORRIGIR</button>
-                        <button class="cyber-btn flex-1 py-5 text-md italic tracking-widest" onclick="app.submit()">FINALIZAR TRANSMISSÃO</button>
+                    <div class="flex gap-3">
+                        <button class="px-6 py-4 border border-zinc-800 text-zinc-600 text-[10px] font-bold" onclick="app.setStep(1)">VOLTAR</button>
+                        <button class="cyber-btn flex-1 py-4 text-sm" onclick="app.validateStep2()">IR PARA O JURAMENTO</button>
                     </div>
                 </div>
             </section>
 
-            <!-- ETAPA 3: STATUS -->
+            <!-- ETAPA 3: JURAMENTO -->
             <section id="step-3" class="step-container">
-                <div id="loading-state" class="text-center py-24">
-                    <div class="inline-block relative w-24 h-24 mb-10">
-                        <div class="absolute inset-0 border-8 border-red-900/20 rounded-full"></div>
-                        <div class="absolute inset-0 border-8 border-red-600 rounded-full border-t-transparent animate-spin"></div>
-                    </div>
-                    <h2 class="font-orbitron text-3xl text-white italic mb-4 tracking-[0.2em] glitch-text">UPLOADING_LOGS</h2>
-                    <div class="w-64 h-2 bg-zinc-900 mx-auto mt-6 border border-zinc-800 overflow-hidden">
-                        <div id="progress-bar" class="h-full bg-red-600 w-0 transition-all duration-300"></div>
-                    </div>
-                    <p id="loading-subtext" class="text-[10px] text-zinc-500 mt-6 tracking-[0.5em] uppercase animate-pulse">Criptografando Provas...</p>
+                <div class="mb-6 flex items-center gap-4">
+                    <span class="text-red-600 font-black italic text-xs uppercase tracking-widest">03. Juramento</span>
+                    <div class="h-[1px] flex-1 bg-zinc-800"></div>
                 </div>
 
-                <div id="success-state" class="hidden text-center py-20">
-                    <div class="bg-red-600 text-black font-black text-6xl py-4 mb-10 italic animate-bounce">MIS_OK</div>
-                    <h2 class="font-orbitron text-4xl text-white mb-6 italic tracking-tighter">SINAL_ENVIADO</h2>
-                    <p class="text-zinc-500 text-sm uppercase tracking-widest mb-12 leading-relaxed">
-                        Seu juramento foi recebido com sucesso.<br>
-                        <span class="text-red-600 font-bold">As fotos serão apagadas em 1 hora.</span><br>
-                        Aguarde o contato da divisão.
+                <div class="cyber-panel p-6 space-y-6">
+                    <div class="bg-black p-4 border border-zinc-800">
+                        <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed mb-4">
+                            Escreva <span class="text-white">"ECLIPSE"</span> e <span class="text-white">"CsL"</span> no seu corpo (pescoço ou perna) e envie a foto abaixo.
+                        </p>
+                        <div id="oath-zone" class="border-2 border-dashed border-red-600/30 p-10 text-center bg-red-600/5 hover:border-red-600 cursor-pointer transition-all">
+                            <input type="file" id="oath-input" class="hidden" accept="image/*">
+                            <i data-lucide="shield-alert" class="w-8 h-8 mx-auto mb-2 text-red-600"></i>
+                            <p class="text-[9px] font-black text-red-600 uppercase tracking-widest">Capturar Foto do Juramento</p>
+                        </div>
+                        <div id="oath-preview" class="hidden mt-3 p-3 bg-red-600/20 border border-red-600 text-[9px] text-white font-bold uppercase text-center">
+                            Imagem de Juramento Capturada
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="px-6 py-4 border border-zinc-800 text-zinc-600 text-[10px] font-bold" onclick="app.setStep(2)">REVISAR</button>
+                        <button class="cyber-btn flex-1 py-4 text-sm" onclick="app.submit()">FINALIZAR TRANSMISSÃO</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ETAPA 4: RESULTADO -->
+            <section id="step-4" class="step-container">
+                <div id="loading-state" class="text-center py-16">
+                    <div class="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                    <p class="font-orbitron text-white text-xs tracking-[0.5em] animate-pulse">UPLOADING_DATA...</p>
+                </div>
+                <div id="success-state" class="hidden text-center py-10">
+                    <i data-lucide="check-circle" class="w-16 h-16 text-green-500 mx-auto mb-6"></i>
+                    <h2 class="text-white font-orbitron text-2xl mb-4 italic">SINAL_OK</h2>
+                    <p class="text-zinc-500 text-[10px] uppercase tracking-widest leading-loose">
+                        Seus dados e juramento foram encriptados.<br>Aguarde contato em seu rádio.
                     </p>
-                    <button class="cyber-btn px-16 py-6 text-md italic" onclick="app.terminate()">FECHAR TERMINAL</button>
+                    <button class="cyber-btn mt-10 px-12 py-4 text-xs" onclick="app.terminate()">ENCERRAR SESSÃO</button>
                 </div>
             </section>
 
         </div>
     </main>
 
-    <!-- MODAL DE ERRO -->
+    <!-- MODAL -->
     <div id="modal" class="fixed inset-0 z-[200] flex items-center justify-center p-6 hidden">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm"></div>
-        <div class="cyber-panel p-10 max-w-sm w-full z-10 border-red-600">
-            <h4 class="text-red-600 font-black italic mb-4 text-xl tracking-tighter text-center">ALERT: SYSTEM_FAILURE</h4>
-            <p id="modal-text" class="text-xs text-white uppercase tracking-widest leading-loose mb-10 text-center"></p>
-            <button class="cyber-btn w-full py-4 text-xs" onclick="app.closeModal()">RETORNAR</button>
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-sm"></div>
+        <div class="cyber-panel p-8 max-w-sm w-full z-10 border-red-600 text-center">
+            <i data-lucide="alert-triangle" class="w-10 h-10 text-red-600 mx-auto mb-4"></i>
+            <p id="modal-text" class="text-[10px] text-white uppercase tracking-widest leading-loose mb-8"></p>
+            <button class="cyber-btn w-full py-3 text-xs" onclick="app.closeModal()">RETORNAR</button>
         </div>
     </div>
 
     <script>
-        // --- SISTEMA DE PROTEÇÃO ANTI-HACKER ---
-        (function() {
-            // Bloqueio de teclas (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I)
-            window.addEventListener('keydown', function(e) {
-                if (
-                    e.keyCode === 123 || // F12
-                    (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
-                    (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
-                    (e.ctrlKey && e.keyCode === 83) || // Ctrl+S
-                    (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
-                    (e.ctrlKey && e.keyCode === 123)
-                ) {
-                    e.preventDefault();
-                    return false;
-                }
+        // Camada de Segurança
+        (function(){
+            window.addEventListener('keydown', e => {
+                if(e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73 || e.keyCode===74)) || (e.ctrlKey && e.keyCode===85)) e.preventDefault();
             });
-
-            // Anti-Debugger Loop
-            setInterval(function() {
-                debugger;
-            }, 500);
-
-            // Bloqueia arraste de elementos (imagens etc)
-            window.addEventListener('dragstart', e => e.preventDefault());
+            setInterval(() => { debugger; }, 1000);
         })();
 
         const app = {
             state: {
+                step: 0,
+                name: '', age: '', nick: '', skills: '',
                 mission: null,
                 files: [],
-                oathFile: null,
-                // Webhook agora protegido por Referrer Policy no Header
-                webhook: "https://discord.com/api/webhooks/1479268013814448200/_qhwmgJFg-UXoHGhO_NRX5tXEvFQZyBkoyUZzsMcrRPYk_-W_3kN17TS5k61ULA5h8D_", 
-                missions: ["RECON", "INFILTRAÇÃO", "EXFILTRAÇÃO", "SABOTAGEM"],
-                maxFileSize: 8 * 1024 * 1024
+                oath: null,
+                webhook: "https://discord.com/api/webhooks/1479268013814448200/_qhwmgJFg-UXoHGhO_NRX5tXEvFQZyBkoyUZzsMcrRPYk_-W_3kN17TS5k61ULA5h8D_",
+                protocols: [
+                    { id: 'RECON', name: 'RECON', desc: 'Monitoramento de base inimiga.', proof: 'Anexe fotos de mapas ou posições.' },
+                    { id: 'INF', name: 'INFILTRAÇÃO', desc: 'Entrada silenciosa em área restrita.', proof: 'Anexe fotos de dentro da base inimiga.' },
+                    { id: 'SAB', name: 'SABOTAGEM', desc: 'Destruição de recursos do oponente.', proof: 'Anexe fotos de logs de destruição.' }
+                ]
             },
 
             init() {
                 this.updateClock();
                 this.renderMissions();
-                this.initFiles();
-                this.initOath();
+                this.setupInputs();
                 lucide.createIcons();
-                
-                const d = new Date();
-                const vhsDate = document.getElementById('vhs-date');
-                if (vhsDate) {
-                    vhsDate.innerText = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }).toUpperCase();
-                }
-                
-                // Console Warning para hackers curiosos
-                console.log("%cINTERRUPÇÃO DO SISTEMA!", "color: red; font-size: 30px; font-weight: bold;");
-                console.log("%cAcesso não autorizado aos logs do sistema resultará em banimento imediato do terminal.", "color: white; font-size: 14px;");
+                document.getElementById('vhs-date').innerText = new Date().toLocaleDateString('en-US', {month:'short', day:'2-digit', year:'numeric'}).toUpperCase();
             },
 
             updateClock() {
                 setInterval(() => {
-                    const clock = document.getElementById('clock');
-                    if (clock) {
-                        clock.innerText = new Date().toLocaleTimeString('pt-PT', { hour12: false });
-                    }
+                    document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-PT', {hour12:false});
                 }, 1000);
             },
 
             setStep(s) {
                 document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-                const target = document.getElementById(`step-${s}`);
-                if (target) target.classList.add('active');
+                document.getElementById(`step-${s}`).classList.add('active');
                 window.scrollTo(0,0);
+            },
+
+            setupInputs() {
+                // Dropzone Provas
+                const zone = document.getElementById('drop-zone');
+                const input = document.getElementById('file-input');
+                zone.onclick = () => input.click();
+                input.onchange = (e) => {
+                    Array.from(e.target.files).forEach(f => {
+                        if (this.state.files.length < 6) this.state.files.push(f);
+                    });
+                    this.renderPreviews();
+                };
+
+                // Dropzone Juramento
+                const oZone = document.getElementById('oath-zone');
+                const oInput = document.getElementById('oath-input');
+                oZone.onclick = () => oInput.click();
+                oInput.onchange = (e) => {
+                    if (e.target.files[0]) {
+                        this.state.oath = e.target.files[0];
+                        document.getElementById('oath-preview').classList.remove('hidden');
+                    }
+                };
             },
 
             renderMissions() {
                 const grid = document.getElementById('mission-grid');
-                if (!grid) return;
-                grid.innerHTML = this.state.missions.map(m => `
-                    <div class="mission-card p-5 text-[11px] text-center font-black text-zinc-600 cursor-pointer flex flex-col items-center justify-center min-h-[80px]" onclick="app.selectMission('${m}', this)">
-                        <div class="card-corner t-l"></div><div class="card-corner t-r"></div><div class="card-corner b-l"></div><div class="card-corner b-r"></div>
-                        <i data-lucide="cpu" class="w-5 h-5 mb-2 mission-icon"></i>
-                        <span class="relative z-10 tracking-[0.2em]">${m}</span>
+                grid.innerHTML = this.state.protocols.map(p => `
+                    <div class="mission-card p-4 cursor-pointer" onclick="app.selectMission('${p.id}', this)">
+                        <h4 class="text-red-600 font-black text-[11px] mb-1">${p.name}</h4>
+                        <p class="text-[9px] text-zinc-500 uppercase mb-1">${p.desc}</p>
+                        <p class="text-[8px] text-zinc-600 italic">PROVA: ${p.proof}</p>
                     </div>
                 `).join('');
-                if (window.lucide) window.lucide.createIcons();
             },
 
-            selectMission(m, el) {
-                document.querySelectorAll('.mission-card').forEach(d => {
-                    d.classList.remove('selected', 'text-red-600');
-                    d.classList.add('text-zinc-600');
-                });
-                el.classList.add('selected', 'text-red-600');
-                el.classList.remove('text-zinc-600');
-                this.state.mission = m;
+            selectMission(id, el) {
+                document.querySelectorAll('.mission-card').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                this.state.mission = id;
             },
 
-            initFiles() {
-                const zone = document.getElementById('drop-zone');
-                const input = document.getElementById('file-input');
-                if (zone && input) {
-                    zone.onclick = () => input.click();
-                    input.onchange = (e) => {
-                        let hasOversizedFiles = false;
-                        Array.from(e.target.files).forEach(f => {
-                            if (f.size > this.state.maxFileSize) {
-                                hasOversizedFiles = true;
-                                return;
-                            }
-                            if (this.state.files.length < 6) {
-                                this.state.files.push({ id: Math.random(), file: f });
-                            }
-                        });
-                        
-                        if(hasOversizedFiles) {
-                            this.showModal("UM OU MAIS ARQUIVOS EXCEDEM O LIMITE DE 8MB E FORAM IGNORADOS.");
-                        }
-
-                        this.renderFiles();
-                        input.value = '';
-                    };
-                }
-            },
-
-            initOath() {
-                const zone = document.getElementById('oath-zone');
-                const input = document.getElementById('oath-input');
-                if (zone && input) {
-                    zone.onclick = () => input.click();
-                    input.onchange = (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                            if (file.size > this.state.maxFileSize) {
-                                return this.showModal("O ARQUIVO DE JURAMENTO EXCEDE O LIMITE DE 8MB.");
-                            }
-                            this.state.oathFile = file;
-                            document.getElementById('oath-preview').classList.remove('hidden');
-                            document.getElementById('oath-filename').innerText = this.state.oathFile.name.toUpperCase();
-                        }
-                    };
-                }
-            },
-
-            renderFiles() {
-                const list = document.getElementById('file-previews');
-                if (!list) return;
-                list.innerHTML = this.state.files.map(f => `
-                    <div class="p-3 border border-red-900 bg-red-600/5 text-[9px] flex justify-between items-center text-red-600 font-bold overflow-hidden">
-                        <span class="truncate pr-4">${f.file.name.toUpperCase()}</span>
-                        <button onclick="app.removeFile(${f.id})" class="hover:text-white flex-shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            renderPreviews() {
+                const p = document.getElementById('file-previews');
+                p.innerHTML = this.state.files.map((f, i) => `
+                    <div class="bg-zinc-900 border border-zinc-800 p-2 text-[8px] text-zinc-500 truncate relative">
+                        ${f.name.toUpperCase()}
+                        <button onclick="app.removeFile(${i})" class="absolute top-0 right-1 text-red-600">×</button>
                     </div>
                 `).join('');
-                lucide.createIcons();
             },
 
-            removeFile(id) {
-                this.state.files = this.state.files.filter(f => f.id !== id);
-                this.renderFiles();
+            removeFile(i) {
+                this.state.files.splice(i, 1);
+                this.renderPreviews();
             },
 
-            checkStep1() {
-                if (!this.state.mission || this.state.files.length === 0) {
-                    return this.showModal("ESCOLHA UMA MISSÃO E ANEXE PELO MENOS UMA PROVA PARA PROSSEGUIR.");
-                }
+            validateStep1() {
+                this.state.name = document.getElementById('reg-name').value;
+                this.state.age = document.getElementById('reg-age').value;
+                this.state.nick = document.getElementById('reg-nick').value;
+                this.state.skills = document.getElementById('reg-skills').value;
+
+                if(!this.state.name || !this.state.age || !this.state.nick) return this.showModal("Preencha os campos obrigatórios de identificação.");
                 this.setStep(2);
             },
 
-            async submit() {
-                if (!this.state.oathFile) {
-                    return this.showModal("JURAMENTO NÃO DETECTADO: A FOTO DA MARCAÇÃO É OBRIGATÓRIA PARA VALIDAR SUA LEALDADE.");
-                }
-
+            validateStep2() {
+                if(!this.state.mission) return this.showModal("Selecione um protocolo de missão.");
+                if(this.state.files.length === 0) return this.showModal("Anexe provas da missão.");
                 this.setStep(3);
-                document.getElementById('loading-state').classList.remove('hidden');
-                document.getElementById('success-state').classList.add('hidden');
-                
-                const prog = document.getElementById('progress-bar');
-                const subtext = document.getElementById('loading-subtext');
-                
+            },
+
+            async submit() {
+                if(!this.state.oath) return this.showModal("A foto do juramento é indispensável.");
+
+                this.setStep(4);
+                const fd = new FormData();
+                const embed = {
+                    title: "⚔️ NOVO RECRUTA REGISTRADO",
+                    color: 16711680,
+                    fields: [
+                        { name: "👤 NOME", value: this.state.name, inline: true },
+                        { name: "🆔 NICK", value: this.state.nick, inline: true },
+                        { name: "📅 IDADE", value: this.state.age, inline: true },
+                        { name: "🎯 MISSÃO", value: this.state.mission, inline: true },
+                        { name: "💡 SKILLS", value: this.state.skills || "Nenhuma informada" }
+                    ],
+                    timestamp: new Date().toISOString()
+                };
+
+                fd.append("payload_json", JSON.stringify({ embeds: [embed] }));
+                this.state.files.forEach((f, i) => fd.append(`file${i}`, f));
+                fd.append("oath", this.state.oath);
+
                 try {
-                    for(let i=0; i<=40; i+=10) {
-                        if (prog) prog.style.width = i + '%';
-                        await new Promise(r => setTimeout(r, 200));
-                    }
-
-                    subtext.innerText = "TRANSFERINDO JURAMENTO...";
-
-                    const fd = new FormData();
-                    const embed = {
-                        title: "⚔️ JURAMENTO DE LEALDADE // CYBER DIVISION",
-                        description: "Um novo recruta prestou o juramento físico.",
-                        color: 16711680,
-                        fields: [
-                            { name: "🎯 OPERAÇÃO", value: this.state.mission, inline: true },
-                            { name: "🛡️ STATUS", value: "PENDENTE", inline: true },
-                            { name: "⚠️ AVISO", value: "EXPURGO DE IMAGENS EM 1H", inline: false }
-                        ],
-                        footer: { text: "CyberDivison // ECLIPSE & CsL PROTOCOL" },
-                        timestamp: new Date().toISOString()
-                    };
-
-                    fd.append("payload_json", JSON.stringify({ embeds: [embed] }));
-                    
-                    let fileIndex = 0;
-                    this.state.files.forEach((f) => {
-                        fd.append(`files[${fileIndex}]`, f.file, f.file.name);
-                        fileIndex++;
-                    });
-                    
-                    fd.append(`files[${fileIndex}]`, this.state.oathFile, this.state.oathFile.name);
-
-                    const response = await fetch(this.state.webhook, {
-                        method: 'POST',
-                        body: fd
-                    });
-
-                    if (response.ok) {
-                        if (prog) prog.style.width = '100%';
-                        subtext.innerText = "TRANSMISSÃO CONCLUÍDA!";
-                        await new Promise(r => setTimeout(r, 800));
-
+                    const res = await fetch(this.state.webhook, { method: 'POST', body: fd });
+                    if(res.ok) {
                         document.getElementById('loading-state').classList.add('hidden');
                         document.getElementById('success-state').classList.remove('hidden');
-                    } else {
-                        throw new Error(`CÓDIGO ${response.status}: SERVIDOR REJEITOU O PACOTE.`);
-                    }
-
-                } catch (err) {
-                    this.setStep(2);
-                    this.showModal("FALHA NA TRANSMISSÃO: " + err.message);
+                    } else throw new Error();
+                } catch(e) {
+                    this.setStep(3);
+                    this.showModal("ERRO NO ENVIO. TENTE NOVAMENTE.");
                 }
             },
 
             terminate() {
-                const content = document.getElementById('app-content');
-                const header = document.getElementById('app-header');
-                const body = document.getElementById('main-body');
-                const screen = document.getElementById('shutdown-screen');
-
-                content.classList.add('shutdown-effect');
-                header.classList.add('shutdown-effect');
-
+                document.getElementById('app-content').classList.add('shutdown-effect');
                 setTimeout(() => {
-                    content.style.display = 'none';
-                    header.style.display = 'none';
-                    body.style.backgroundColor = 'black';
-                    screen.style.display = 'flex';
-                    
-                    setTimeout(() => {
-                        window.close();
-                    }, 2000);
-                }, 600);
+                    document.getElementById('app-content').style.display = 'none';
+                    document.getElementById('shutdown-screen').style.display = 'flex';
+                }, 500);
             },
 
-            showModal(text) {
-                const modal = document.getElementById('modal');
-                const modalText = document.getElementById('modal-text');
-                modalText.innerText = text;
-                modal.classList.remove('hidden');
+            showModal(t) {
+                document.getElementById('modal-text').innerText = t;
+                document.getElementById('modal').classList.remove('hidden');
             },
-
             closeModal() {
                 document.getElementById('modal').classList.add('hidden');
             }
