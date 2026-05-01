@@ -57,7 +57,7 @@
         }
 
         .cyber-panel::before {
-            content: "SECURE_TERMINAL_v4.0";
+            content: "Faça tudo corretamente";
             position: absolute; top: -12px; left: 15px;
             background: var(--red-main); color: black;
             font-size: 8px; padding: 2px 8px; font-weight: 900;
@@ -139,7 +139,7 @@
     <header id="app-header" class="fixed top-0 w-full p-6 flex justify-between items-start z-50 pointer-events-none">
         <div class="flex flex-col">
             <div class="flex items-center text-red-600 font-black italic text-xl">
-                <span class="rec-dot mr-2"></span> REC_START
+                <span class="rec-dot mr-2"></span> REC
             </div>
             <div class="text-[9px] text-zinc-600 font-bold uppercase mt-1">Status: Recrutamento Ativo</div>
         </div>
@@ -156,7 +156,7 @@
             <section id="step-0" class="step-container active">
                 <div class="text-center mb-8">
                     <h1 class="font-orbitron text-5xl md:text-7xl font-black text-white italic tracking-tighter">
-                        VOID<span class="text-red-600">_REG</span>
+                        CYBER<span class="text-red-600">DIVISION</span>
                     </h1>
                 </div>
 
@@ -200,7 +200,7 @@
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-zinc-500 uppercase mb-2 block tracking-widest">Especialidade (O que você faz de melhor?)</label>
-                        <textarea id="reg-skills" class="cyber-input h-24 resize-none" placeholder="Ex: Invasão de sistemas, Reconhecimento de campo..."></textarea>
+                        <textarea id="reg-skills" class="cyber-input h-24 resize-none" placeholder="Ex: Engenharia social, invasão de sistemas, ddos..."></textarea>
                     </div>
 
                     <button class="cyber-btn w-full py-5 text-sm" onclick="app.validateStep1()">PRÓXIMA FASE: PROTOCOLO</button>
@@ -271,7 +271,7 @@
                 </div>
                 <div id="success-state" class="hidden text-center py-10">
                     <i data-lucide="check-circle" class="w-16 h-16 text-green-500 mx-auto mb-6"></i>
-                    <h2 class="text-white font-orbitron text-2xl mb-4 italic">SINAL_OK</h2>
+                    <h2 class="text-white font-orbitron text-2xl mb-4 italic">Informações recebidas!!</h2>
                     <p class="text-zinc-500 text-[10px] uppercase tracking-widest leading-loose">
                         Seus dados e juramento foram encriptados.<br>Aguarde contato em seu rádio.
                     </p>
@@ -298,7 +298,8 @@
             window.addEventListener('keydown', e => {
                 if(e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73 || e.keyCode===74)) || (e.ctrlKey && e.keyCode===85)) e.preventDefault();
             });
-            setInterval(() => { debugger; }, 1000);
+            // Comentado para não travar quem está editando, mas você pode descomentar em produção
+            // setInterval(() => { debugger; }, 1000);
         })();
 
         const app = {
@@ -310,9 +311,30 @@
                 oath: null,
                 webhook: "https://discord.com/api/webhooks/1479268013814448200/_qhwmgJFg-UXoHGhO_NRX5tXEvFQZyBkoyUZzsMcrRPYk_-W_3kN17TS5k61ULA5h8D_",
                 protocols: [
-                    { id: 'RECON', name: 'RECON', desc: 'Monitoramento de base inimiga.', proof: 'Anexe fotos de mapas ou posições.' },
-                    { id: 'INF', name: 'INFILTRAÇÃO', desc: 'Entrada silenciosa em área restrita.', proof: 'Anexe fotos de dentro da base inimiga.' },
-                    { id: 'SAB', name: 'SABOTAGEM', desc: 'Destruição de recursos do oponente.', proof: 'Anexe fotos de logs de destruição.' }
+                    { 
+                        id: 'SOCIAL_ENG', 
+                        name: 'ENGENHARIA SOCIAL', 
+                        desc: 'Fingir amizade ou intimidade com um alvo específico. Ganhar a confiança da pessoa para extrair dados bancários, senhas, fotos ou informações pessoais sigilosas sem que ela perceba.', 
+                        proof: 'Anexe prints das conversas mostrando você manipulando o alvo e obtendo as informações.' 
+                    },
+                    { 
+                        id: 'INFILT', 
+                        name: 'INFILTRAÇÃO DE REDE/GRUPO', 
+                        desc: 'Entrar em um servidor do Discord, facção ou grupo inimigo disfarçado de aliado. Subir de cargo silenciosamente para espionar os líderes e vazar tudo o que planejam.', 
+                        proof: 'Anexe prints de canais restritos, chats de diretoria ou painéis administrativos do inimigo.' 
+                    },
+                    { 
+                        id: 'OSINT', 
+                        name: 'OSINT (INVESTIGAÇÃO/DOX)', 
+                        desc: 'Mapear a vida completa de um alvo usando fontes abertas. Vasculhar redes sociais, registros públicos e históricos para descobrir onde ele mora, quem é a família e sua rotina.', 
+                        proof: 'Anexe um print do dossiê final ou dados reais concretos encontrados sobre o alvo.' 
+                    },
+                    { 
+                        id: 'SABOT', 
+                        name: 'SABOTAGEM INTERNA', 
+                        desc: 'Causar destruição digital de dentro para fora. Ganhar permissões para deletar canais, banir membros em massa (raid), roubar contas ou plantar intrigas para destruir a comunidade deles.', 
+                        proof: 'Anexe prints dos logs de auditoria mostrando a destruição ou o caos causado por você.' 
+                    }
                 ]
             },
 
@@ -364,9 +386,12 @@
                 const grid = document.getElementById('mission-grid');
                 grid.innerHTML = this.state.protocols.map(p => `
                     <div class="mission-card p-4 cursor-pointer" onclick="app.selectMission('${p.id}', this)">
-                        <h4 class="text-red-600 font-black text-[11px] mb-1">${p.name}</h4>
-                        <p class="text-[9px] text-zinc-500 uppercase mb-1">${p.desc}</p>
-                        <p class="text-[8px] text-zinc-600 italic">PROVA: ${p.proof}</p>
+                        <h4 class="text-red-600 font-black text-[12px] mb-2 tracking-wide">${p.name}</h4>
+                        <p class="text-[10px] text-zinc-400 uppercase mb-3 leading-relaxed">${p.desc}</p>
+                        <div class="bg-red-950/30 p-2 border border-red-900/50">
+                            <p class="text-[9px] text-red-500/80 font-bold tracking-widest uppercase">PROVA EXIGIDA:</p>
+                            <p class="text-[9px] text-zinc-500 italic mt-1">${p.proof}</p>
+                        </div>
                     </div>
                 `).join('');
             },
@@ -382,7 +407,7 @@
                 p.innerHTML = this.state.files.map((f, i) => `
                     <div class="bg-zinc-900 border border-zinc-800 p-2 text-[8px] text-zinc-500 truncate relative">
                         ${f.name.toUpperCase()}
-                        <button onclick="app.removeFile(${i})" class="absolute top-0 right-1 text-red-600">×</button>
+                        <button onclick="app.removeFile(${i})" class="absolute top-0 right-1 text-red-600 font-bold text-xs">×</button>
                     </div>
                 `).join('');
             },
@@ -403,13 +428,13 @@
             },
 
             validateStep2() {
-                if(!this.state.mission) return this.showModal("Selecione um protocolo de missão.");
-                if(this.state.files.length === 0) return this.showModal("Anexe provas da missão.");
+                if(!this.state.mission) return this.showModal("Selecione um protocolo de missão tática.");
+                if(this.state.files.length === 0) return this.showModal("Anexe as provas visuais da operação.");
                 this.setStep(3);
             },
 
             async submit() {
-                if(!this.state.oath) return this.showModal("A foto do juramento é indispensável.");
+                if(!this.state.oath) return this.showModal("A foto do juramento corporal é indispensável.");
 
                 this.setStep(4);
                 const fd = new FormData();
@@ -438,7 +463,7 @@
                     } else throw new Error();
                 } catch(e) {
                     this.setStep(3);
-                    this.showModal("ERRO NO ENVIO. TENTE NOVAMENTE.");
+                    this.showModal("ERRO NO ENVIO DA TRANSMISSÃO. TENTE NOVAMENTE.");
                 }
             },
 
