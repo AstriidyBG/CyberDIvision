@@ -3,418 +3,606 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✦ CONSTELAÇÃO SANGRENTA ✦ | CSL | Hago</title>
+<title>✦ CSL — CONSTELAÇÃO SANGRENTA ✦</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════ RESET ═══════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --red:#cc0000;--red-bright:#ff0000;--red-dark:#8b0000;--red-deep:#3d0000;
-  --gold:#ffd700;--gold-dim:#b8960c;
-  --white:#f0f0f0;--gray:#aaaaaa;
-  --bg:#0a0a0a;--bg2:#0f0000;
-  --glass:rgba(20,0,0,0.72);
-  --glow:0 0 18px rgba(204,0,0,0.7),0 0 40px rgba(204,0,0,0.3);
-  --glow-gold:0 0 12px rgba(255,215,0,0.5);
-  --font-display:'Cinzel',serif;
-  --font-body:'Rajdhani',sans-serif;
+  --r1:#cc0000;--r2:#ff0000;--r3:#8b0000;--r4:#3d0000;--r5:#1a0000;
+  --g:#ffd700;--g2:#b8960c;
+  --w:#f0f0f0;--w2:#aaaaaa;--w3:#555;
+  --bg:#050505;--bg2:#0a0000;
+  --glass:rgba(15,0,0,0.8);
+  --glow:0 0 20px rgba(204,0,0,0.8),0 0 50px rgba(204,0,0,0.3);
+  --glow2:0 0 8px rgba(204,0,0,0.5);
+  --cyber:#00ffcc;
+  --cyberdim:rgba(0,255,204,0.12);
+  --fD:'Bebas Neue',sans-serif;
+  --fB:'Rajdhani',sans-serif;
+  --fM:'Share Tech Mono',monospace;
 }
 html{scroll-behavior:smooth}
 body{
   background:var(--bg);
-  color:var(--white);
-  font-family:var(--font-body);
+  color:var(--w);
+  font-family:var(--fB);
   font-size:16px;
   line-height:1.6;
   overflow-x:hidden;
-  min-height:100vh;
 }
 
-/* ── CANVAS & PARTICLES ── */
-#starCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+/* ═══════════════ SCROLLBAR ═══════════════ */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#0a0000}
+::-webkit-scrollbar-thumb{background:var(--r1);border-radius:2px}
 
-/* ── BLOOD DROPS ── */
-.blood-container{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:hidden}
-.drop{position:absolute;top:-40px;width:4px;border-radius:50% 50% 40% 40%/60% 60% 40% 40%;background:linear-gradient(180deg,#8b0000,#cc0000);opacity:0;animation:fall linear infinite}
-.drop::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:8px;height:6px;border-radius:50%;background:#8b0000;opacity:.6}
-@keyframes fall{0%{top:-40px;opacity:.7}80%{opacity:.5}100%{top:110vh;opacity:0}}
+/* ═══════════════ CANVAS / BG ═══════════════ */
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.noise{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+  mix-blend-mode:overlay;
+}
+.scanlines{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+  animation:scanMove 8s linear infinite;
+}
+@keyframes scanMove{0%{background-position:0 0}100%{background-position:0 100%}}
 
-/* ── LAYOUT ── */
+/* Blood drips */
+.drips{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:hidden}
+.drip{position:absolute;top:-60px;border-radius:0 0 50% 50%;background:linear-gradient(180deg,var(--r3) 0%,var(--r2) 70%,transparent 100%);opacity:0;animation:drip linear infinite}
+@keyframes drip{0%{top:-60px;opacity:.6}85%{opacity:.4}100%{top:110vh;opacity:0}}
+
+/* ═══════════════ INTRO SCREEN ═══════════════ */
+#intro{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s ease,visibility .8s ease;
+}
+#intro.gone{opacity:0;visibility:hidden}
+.intro-lines{position:absolute;inset:0;overflow:hidden}
+.intro-lines::before,.intro-lines::after{
+  content:'';position:absolute;
+  background:var(--r1);
+  animation:introLine 1.5s ease forwards;
+}
+.intro-lines::before{top:50%;left:0;width:0;height:1px;animation-delay:.2s}
+.intro-lines::after{bottom:calc(50% - 2px);right:0;width:0;height:1px;animation-delay:.4s}
+@keyframes introLine{to{width:100%}}
+.intro-emblem{
+  font-family:var(--fD);
+  font-size:clamp(3rem,10vw,8rem);
+  color:transparent;
+  -webkit-text-stroke:1px var(--r1);
+  letter-spacing:.15em;
+  animation:emblemIn 1s ease .8s both;
+  position:relative;
+  text-align:center;
+}
+.intro-emblem::after{
+  content:'CSL';
+  position:absolute;top:0;left:0;width:100%;
+  color:var(--r1);
+  opacity:0;
+  animation:emblemFill 1s ease 1.4s both;
+  filter:blur(0);
+}
+@keyframes emblemIn{from{opacity:0;transform:scaleX(3);letter-spacing:.8em}to{opacity:1;transform:scaleX(1);letter-spacing:.15em}}
+@keyframes emblemFill{from{opacity:0;filter:blur(20px)}to{opacity:.15;filter:blur(0)}}
+.intro-sub{
+  font-family:var(--fM);
+  font-size:clamp(.7rem,2vw,1rem);
+  color:var(--r1);
+  letter-spacing:.4em;
+  text-transform:uppercase;
+  opacity:0;
+  animation:fadeUp .8s ease 1.8s both;
+  margin-top:16px;
+}
+.intro-bar{
+  width:200px;height:2px;
+  background:var(--r4);
+  margin-top:40px;
+  position:relative;overflow:hidden;
+  opacity:0;animation:fadeUp .5s ease 2.2s both;
+}
+.intro-bar::after{
+  content:'';position:absolute;top:0;left:-100%;
+  width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,var(--r1),transparent);
+  animation:scanBar 1.2s ease 2.3s both;
+}
+@keyframes scanBar{to{left:100%}}
+.intro-pct{
+  font-family:var(--fM);font-size:.8rem;color:var(--r1);
+  margin-top:12px;letter-spacing:.2em;
+  opacity:0;animation:fadeUp .5s ease 2.4s both;
+}
+.intro-enter{
+  margin-top:44px;
+  font-family:var(--fD);font-size:1.4rem;letter-spacing:.3em;
+  color:var(--r1);background:transparent;
+  border:1px solid var(--r1);padding:14px 44px;
+  cursor:pointer;
+  opacity:0;animation:fadeUp .6s ease 3.2s both;
+  transition:background .2s,box-shadow .2s,color .2s;
+  text-transform:uppercase;
+  box-shadow:inset 0 0 0 0 var(--r1);
+}
+.intro-enter:hover{
+  background:var(--r1);color:#fff;
+  box-shadow:var(--glow);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ═══════════════ WRAPPER ═══════════════ */
 .wrapper{position:relative;z-index:2}
 
-/* ── HEADER ── */
+/* ═══════════════ HEADER ═══════════════ */
 header{
-  text-align:center;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:80px 20px 60px;
-  background:linear-gradient(180deg,rgba(80,0,0,0.35) 0%,transparent 100%);
-  border-bottom:1px solid rgba(204,0,0,0.25);
-}
-.header-deco{color:var(--red);font-size:1.1rem;letter-spacing:.3em;font-family:var(--font-body);font-weight:600;margin-bottom:18px;text-shadow:var(--glow)}
-
-/* GLITCH */
-.glitch-wrap{position:relative;display:inline-block}
-.glitch{
-  font-family:var(--font-display);
-  font-size:clamp(2rem,7vw,5rem);
-  font-weight:900;
-  color:var(--white);
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  position:relative;
-  animation:glitchBase 4s infinite;
-}
-.glitch::before,.glitch::after{
-  content:attr(data-text);
-  position:absolute;top:0;left:0;width:100%;height:100%;
-}
-.glitch::before{
-  color:#ff0000;
-  animation:glitch1 4s infinite;
-  clip-path:polygon(0 0,100% 0,100% 35%,0 35%);
-  transform:translateX(-3px);
-}
-.glitch::after{
-  color:#00d4ff;
-  animation:glitch2 4s infinite;
-  clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);
-  transform:translateX(3px);
-}
-@keyframes glitchBase{0%,90%,100%{text-shadow:none}91%{text-shadow:2px 0 #ff0000,-2px 0 #00d4ff}95%{text-shadow:-2px 0 #ff0000,2px 0 #00d4ff}}
-@keyframes glitch1{0%,89%,100%{opacity:0;transform:translateX(0)}90%{opacity:1;transform:translateX(-4px) skewX(-2deg)}93%{transform:translateX(4px) skewX(2deg)}96%{opacity:0}}
-@keyframes glitch2{0%,89%,100%{opacity:0;transform:translateX(0)}90%{opacity:1;transform:translateX(4px) skewX(2deg)}93%{transform:translateX(-4px) skewX(-2deg)}96%{opacity:0}}
-
-.subtitle{
-  font-family:var(--font-body);
-  font-size:clamp(1rem,2.5vw,1.4rem);
-  color:var(--red);
-  letter-spacing:.2em;
-  margin:14px 0 28px;
-  font-weight:500;
-}
-.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:10px}
-.badge{
-  background:var(--glass);
-  border:1px solid rgba(204,0,0,0.5);
-  border-radius:6px;
-  padding:8px 18px;
-  font-family:var(--font-body);
-  font-weight:600;
-  font-size:.9rem;
-  letter-spacing:.05em;
-  color:var(--white);
-  backdrop-filter:blur(10px);
-  box-shadow:var(--glow);
-  transition:transform .2s,box-shadow .2s;
-}
-.badge:hover{transform:translateY(-2px);box-shadow:0 0 25px rgba(255,0,0,0.6)}
-.badge.gold{border-color:var(--gold);color:var(--gold);box-shadow:var(--glow-gold)}
-
-/* ── NAV ── */
-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(10,0,0,0.92);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(204,0,0,0.3);
-  padding:0 20px;
-}
-.nav-inner{display:flex;justify-content:center;flex-wrap:wrap;gap:0}
-.nav-inner a{
-  color:var(--gray);
-  text-decoration:none;
-  font-family:var(--font-body);
-  font-weight:600;
-  font-size:.85rem;
-  letter-spacing:.1em;
-  padding:14px 18px;
-  border-bottom:2px solid transparent;
-  transition:color .2s,border-color .2s;
-  white-space:nowrap;
-}
-.nav-inner a:hover{color:var(--red-bright);border-bottom-color:var(--red-bright)}
-
-/* ── SECTIONS ── */
-section{padding:70px 20px;max-width:1100px;margin:0 auto}
-.section-title{
-  font-family:var(--font-display);
-  font-size:clamp(1.4rem,3.5vw,2.4rem);
-  color:var(--red);
   text-align:center;
-  letter-spacing:.1em;
-  margin-bottom:50px;
-  text-shadow:var(--glow);
-  position:relative;
-}
-.section-title::after{
-  content:'';display:block;width:80px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--red),transparent);
-  margin:14px auto 0;
-}
-
-/* ── RULES CARDS ── */
-.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
-.rule-card{
-  background:var(--glass);
-  border:1px solid rgba(204,0,0,0.35);
-  border-radius:12px;
-  padding:28px 24px;
-  backdrop-filter:blur(12px);
-  box-shadow:var(--glow);
   position:relative;
   overflow:hidden;
-  transition:transform .25s,box-shadow .25s;
-  animation:cardIn .6s ease both;
 }
-.rule-card:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 0 35px rgba(204,0,0,0.6)}
-.rule-card::before{
-  content:'';position:absolute;top:0;left:0;width:3px;height:100%;
-  background:linear-gradient(180deg,var(--red-bright),var(--red-dark));
+header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(80,0,0,0.35) 0%,transparent 70%);
+  pointer-events:none;
 }
-.rule-card .rule-icon{font-size:2rem;margin-bottom:10px;display:block}
-.rule-card h3{
-  font-family:var(--font-display);
-  font-size:1rem;color:var(--red);
-  letter-spacing:.08em;margin-bottom:10px;
+/* Corner brackets */
+header::after{
+  content:'';position:absolute;
+  inset:30px;
+  border:1px solid rgba(204,0,0,0.12);
+  pointer-events:none;
 }
-.rule-card p{font-size:.95rem;color:var(--gray);line-height:1.7}
-@keyframes cardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hdr-tag{
+  font-family:var(--fM);font-size:.75rem;
+  color:var(--r1);letter-spacing:.5em;
+  margin-bottom:28px;opacity:.7;
+  display:flex;align-items:center;gap:16px;
+}
+.hdr-tag::before,.hdr-tag::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--r1))}
+.hdr-tag::after{background:linear-gradient(90deg,var(--r1),transparent)}
 
-/* ── FORM ── */
-#registro{max-width:900px}
-.form-card{
-  background:var(--glass);
-  border:1px solid rgba(204,0,0,0.4);
-  border-radius:16px;
-  padding:40px 36px;
-  backdrop-filter:blur(14px);
-  box-shadow:var(--glow),0 0 80px rgba(80,0,0,0.2);
-}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
-.form-group{display:flex;flex-direction:column;gap:7px}
-.form-group.full{grid-column:1/-1}
-label{
-  font-family:var(--font-body);
-  font-weight:600;font-size:.85rem;
-  color:var(--red);letter-spacing:.06em;text-transform:uppercase;
-}
-input,select,textarea{
-  background:rgba(0,0,0,0.6);
-  border:1px solid rgba(204,0,0,0.4);
-  border-radius:8px;
-  color:var(--white);
-  font-family:var(--font-body);
-  font-size:1rem;
-  padding:12px 15px;
-  outline:none;
-  transition:border-color .2s,box-shadow .2s;
-  width:100%;
-}
-input:focus,select:focus,textarea:focus{
-  border-color:var(--red-bright);
-  box-shadow:0 0 12px rgba(255,0,0,0.35);
-}
-input::placeholder,textarea::placeholder{color:rgba(170,170,170,0.5)}
-select option{background:#1a0000;color:var(--white)}
-textarea{resize:vertical;min-height:120px}
-
-/* Radio & Checkbox */
-.radio-group,.check-group{display:flex;flex-direction:column;gap:10px}
-.radio-item,.check-item{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.95rem;color:var(--white)}
-.radio-item input[type=radio],.check-item input[type=checkbox]{
-  accent-color:var(--red-bright);
-  width:17px;height:17px;flex-shrink:0;margin-top:2px;
-  background:transparent;border:none;padding:0;
-}
-.checkboxes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
-
-/* Error */
-.err{color:#ff4444;font-size:.8rem;display:none;margin-top:3px}
-.err.show{display:block}
-input.invalid,select.invalid,textarea.invalid{border-color:#ff4444!important}
-
-/* Confirm */
-.confirm-item{display:flex;align-items:flex-start;gap:12px;padding:18px;background:rgba(80,0,0,0.2);border:1px solid rgba(204,0,0,0.4);border-radius:8px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--white)}
-.confirm-item input{accent-color:var(--red-bright);width:18px;height:18px;flex-shrink:0;margin-top:1px;background:transparent;border:none;padding:0;}
-
-/* Submit */
-.btn-submit{
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  width:100%;padding:20px;margin-top:28px;
-  background:linear-gradient(135deg,var(--red-dark),var(--red),var(--red-dark));
-  background-size:200% 200%;
-  border:none;border-radius:10px;
-  color:var(--white);
-  font-family:var(--font-display);
-  font-size:1.1rem;font-weight:700;letter-spacing:.1em;
-  cursor:pointer;
-  box-shadow:var(--glow);
-  animation:pulse 2.5s ease infinite;
-  transition:opacity .2s;
+/* GLITCH TITLE */
+.gtitle{
+  font-family:var(--fD);
+  font-size:clamp(2.5rem,9vw,7.5rem);
+  letter-spacing:.06em;
+  color:var(--w);
+  position:relative;
+  line-height:.95;
   text-transform:uppercase;
 }
-.btn-submit:hover{animation:none;background-position:100% 100%;box-shadow:0 0 40px rgba(255,0,0,0.8)}
-.btn-submit:disabled{opacity:.6;cursor:not-allowed;animation:none}
-@keyframes pulse{0%,100%{box-shadow:0 0 15px rgba(204,0,0,0.6)}50%{box-shadow:0 0 35px rgba(255,0,0,0.9),0 0 60px rgba(204,0,0,0.4)}}
+.gtitle span{display:block}
+.gtitle span:first-child{font-size:.35em;letter-spacing:.35em;color:var(--r1);margin-bottom:8px;font-family:var(--fM)}
+.gtitle span:last-child{font-size:.28em;letter-spacing:.25em;color:var(--w2);margin-top:12px;font-family:var(--fM)}
+.gtitle .main{
+  -webkit-text-stroke:1px rgba(255,255,255,0.08);
+  text-shadow:0 0 60px rgba(204,0,0,0.4);
+  position:relative;animation:glitchT 5s infinite;
+}
+.gtitle .main::before{
+  content:attr(data-t);position:absolute;top:0;left:0;width:100%;
+  color:var(--r2);clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);
+  animation:glA 5s infinite;
+}
+.gtitle .main::after{
+  content:attr(data-t);position:absolute;top:0;left:0;width:100%;
+  color:#00d4ff;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);
+  animation:glB 5s infinite;
+}
+@keyframes glitchT{0%,88%,100%{transform:none}89%{transform:skewX(-1deg) translateX(-3px)}91%{transform:skewX(1deg) translateX(3px)}93%{transform:none}}
+@keyframes glA{0%,88%,100%{opacity:0;transform:none}89%{opacity:1;transform:translateX(-5px)}92%{opacity:0}}
+@keyframes glB{0%,90%,100%{opacity:0;transform:none}91%{opacity:1;transform:translateX(5px)}94%{opacity:0}}
 
-/* Spinner */
-.spinner{display:none;width:22px;height:22px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* BADGES */
+.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:40px}
+.badge{
+  font-family:var(--fM);font-size:.72rem;letter-spacing:.1em;
+  padding:8px 20px;
+  border:1px solid rgba(204,0,0,0.4);
+  background:rgba(10,0,0,0.7);
+  backdrop-filter:blur(8px);
+  color:var(--w2);
+  position:relative;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  transition:color .2s,border-color .2s,box-shadow .2s;
+}
+.badge:hover,.badge.hi{color:var(--r1);border-color:var(--r1);box-shadow:var(--glow2)}
+.badge.gold{color:var(--g);border-color:var(--g);box-shadow:0 0 12px rgba(255,215,0,0.3)}
 
-/* ── SUCCESS MODAL ── */
-#successModal{
-  display:none;position:fixed;inset:0;z-index:999;
-  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
+/* scroll cue */
+.scroll-cue{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  font-family:var(--fM);font-size:.65rem;color:rgba(204,0,0,0.5);letter-spacing:.3em;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:cueFloat 2s ease infinite;
+}
+.scroll-cue::after{content:'';width:1px;height:40px;background:linear-gradient(180deg,var(--r1),transparent)}
+@keyframes cueFloat{0%,100%{opacity:.5;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(-6px)}}
+
+/* ═══════════════ NAV ═══════════════ */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(5,0,0,0.96);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(204,0,0,0.2);
+}
+.nav-inner{display:flex;justify-content:center;flex-wrap:wrap}
+.nav-inner a{
+  color:var(--w3);text-decoration:none;
+  font-family:var(--fM);font-size:.7rem;letter-spacing:.15em;
+  padding:15px 20px;
+  border-bottom:2px solid transparent;
+  transition:color .2s,border-color .2s;
+  text-transform:uppercase;
+}
+.nav-inner a:hover{color:var(--r1);border-bottom-color:var(--r1)}
+
+/* ═══════════════ SECTIONS ═══════════════ */
+.sec{padding:80px 20px;max-width:1100px;margin:0 auto}
+.stitle{
+  font-family:var(--fD);
+  font-size:clamp(1.8rem,4vw,3.2rem);
+  color:var(--w);letter-spacing:.1em;
+  text-align:center;margin-bottom:60px;
+  position:relative;
+}
+.stitle em{color:var(--r1);font-style:normal}
+.stitle::before{
+  content:attr(data-num);
+  position:absolute;right:0;top:-20px;
+  font-family:var(--fD);font-size:5rem;
+  color:rgba(204,0,0,0.07);letter-spacing:0;
+  pointer-events:none;
+}
+.stitle-line{
+  display:flex;align-items:center;gap:16px;
+  justify-content:center;margin-top:14px;font-size:0;
+}
+.stitle-line::before,.stitle-line::after{
+  content:'';flex:0 0 60px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--r1));
+  display:inline-block;
+}
+.stitle-line::after{background:linear-gradient(90deg,var(--r1),transparent)}
+.stitle-line span{width:6px;height:6px;background:var(--r1);transform:rotate(45deg);display:inline-block}
+
+/* ═══════════════ RULES ═══════════════ */
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:2px}
+.rule-card{
+  background:var(--glass);
+  border:1px solid rgba(204,0,0,0.15);
+  padding:32px 28px;
+  position:relative;overflow:hidden;
+  transition:border-color .25s,transform .25s;
+}
+.rule-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:0;background:var(--r1);transition:height .4s ease}
+.rule-card:hover{border-color:rgba(204,0,0,0.5);transform:translateY(-3px)}
+.rule-card:hover::before{height:100%}
+.rule-card .rnum{
+  font-family:var(--fD);font-size:4rem;color:rgba(204,0,0,0.06);
+  position:absolute;top:-8px;right:16px;letter-spacing:0;line-height:1;
+}
+.rule-card h3{
+  font-family:var(--fD);font-size:1.2rem;color:var(--r1);
+  letter-spacing:.12em;margin-bottom:12px;
+}
+.rule-card p{font-size:.9rem;color:var(--w2);line-height:1.75;font-family:var(--fB)}
+
+/* ═══════════════ FORM ═══════════════ */
+#registro{max-width:860px}
+.form-shell{
+  background:var(--glass);
+  border:1px solid rgba(204,0,0,0.2);
+  padding:48px 40px;
+  position:relative;
+  overflow:hidden;
+}
+.form-shell::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--r1),var(--g),var(--r1),transparent);
+  animation:topGlow 3s ease infinite;
+}
+@keyframes topGlow{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* corner deco */
+.form-shell::after{
+  content:'';position:absolute;
+  bottom:0;right:0;
+  width:80px;height:80px;
+  border-bottom:1px solid rgba(204,0,0,0.3);
+  border-right:1px solid rgba(204,0,0,0.3);
+}
+
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:620px){.fgrid{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+
+label.fl{
+  font-family:var(--fM);font-size:.68rem;color:var(--r1);
+  letter-spacing:.12em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+label.fl::before{content:'//';color:rgba(204,0,0,0.4);font-size:.6rem}
+
+input,select,textarea{
+  background:rgba(0,0,0,0.7);
+  border:1px solid rgba(204,0,0,0.2);
+  border-radius:0;
+  color:var(--w);
+  font-family:var(--fM);font-size:.85rem;
+  padding:12px 16px;
+  outline:none;width:100%;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+  -webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--r1);
+  background:rgba(30,0,0,0.6);
+  box-shadow:0 0 16px rgba(204,0,0,0.2),inset 0 0 8px rgba(204,0,0,0.05);
+}
+input::placeholder,textarea::placeholder{color:rgba(120,80,80,0.6);font-family:var(--fM)}
+select option{background:#100000;color:var(--w)}
+textarea{resize:vertical;min-height:130px}
+input.inv,select.inv,textarea.inv{border-color:#ff3333;background:rgba(40,0,0,0.5)}
+.err{color:#ff4444;font-family:var(--fM);font-size:.65rem;letter-spacing:.08em;display:none;margin-top:4px}
+.err.on{display:block}
+
+/* selects limit note */
+.limit-note{font-family:var(--fM);font-size:.65rem;color:rgba(255,215,0,0.6);letter-spacing:.08em;margin-bottom:8px}
+
+/* function select */
+.func-select-wrap{position:relative}
+.func-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:24px}
+.ftag{
+  font-family:var(--fM);font-size:.65rem;
+  background:rgba(80,0,0,0.5);border:1px solid var(--r1);
+  color:var(--r1);padding:4px 10px;
+  display:flex;align-items:center;gap:6px;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.ftag button{background:none;border:none;color:var(--r2);cursor:pointer;font-size:.8rem;padding:0;line-height:1}
+
+/* Radio & check */
+.radio-group,.cgroup{display:flex;flex-direction:column;gap:8px}
+.ri,.ci{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-family:var(--fB);font-size:.9rem;color:var(--w2);transition:color .2s}
+.ri:hover,.ci:hover{color:var(--w)}
+.ri input[type=radio],.ci input[type=checkbox]{
+  width:16px;height:16px;flex-shrink:0;margin-top:2px;
+  accent-color:var(--r2);background:transparent;border:none;padding:0;
+}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+
+/* confirm */
+.oath{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:20px;
+  border:1px solid rgba(204,0,0,0.3);
+  background:rgba(30,0,0,0.4);
+  cursor:pointer;
+  font-family:var(--fB);font-size:.9rem;color:var(--w2);
+  transition:border-color .2s;
+}
+.oath:hover{border-color:var(--r1)}
+.oath input{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--r2);background:transparent;border:none;padding:0;}
+
+/* SUBMIT BTN */
+.btn-sub{
+  width:100%;margin-top:32px;padding:22px 40px;
+  background:transparent;
+  border:1px solid var(--r1);
+  color:var(--r1);
+  font-family:var(--fD);font-size:1.4rem;letter-spacing:.2em;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:color .3s,box-shadow .3s;
+  text-transform:uppercase;
+}
+.btn-sub::before{
+  content:'';position:absolute;inset:0;
+  background:var(--r1);transform:scaleX(0);transform-origin:left;
+  transition:transform .3s ease;z-index:0;
+}
+.btn-sub:hover::before{transform:scaleX(1)}
+.btn-sub:hover{color:#fff;box-shadow:var(--glow)}
+.btn-sub span{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:14px}
+.btn-sub:disabled{opacity:.5;cursor:not-allowed}
+.btn-sub:disabled::before{display:none}
+.spin{width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ═══════════════ SUCCESS ═══════════════ */
+#modal{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);
   align-items:center;justify-content:center;
 }
-#successModal.show{display:flex}
-.modal-box{
-  background:linear-gradient(135deg,#1a0000,#0d0000);
-  border:1px solid var(--red);border-radius:16px;
-  padding:50px 40px;text-align:center;max-width:500px;width:90%;
-  box-shadow:0 0 60px rgba(204,0,0,0.5);
-  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+#modal.on{display:flex}
+.mbox{
+  max-width:520px;width:92%;
+  border:1px solid var(--r1);
+  background:linear-gradient(160deg,#180000,#0a0000);
+  padding:60px 40px;text-align:center;
+  position:relative;overflow:hidden;
+  animation:mIn .4s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
-.modal-box h2{font-family:var(--font-display);color:var(--gold);font-size:1.8rem;margin-bottom:16px}
-.modal-box p{color:var(--gray);font-size:1rem;margin-bottom:28px}
-.modal-close{
-  background:var(--red);border:none;border-radius:8px;
-  color:var(--white);font-family:var(--font-body);font-size:1rem;font-weight:700;
-  padding:12px 32px;cursor:pointer;
-  box-shadow:var(--glow);transition:background .2s;
+.mbox::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--r1),transparent)}
+@keyframes mIn{from{opacity:0;transform:scale(.75) translateY(30px)}to{opacity:1;transform:none}}
+.mbox h2{font-family:var(--fD);font-size:2.5rem;color:var(--g);letter-spacing:.12em;margin-bottom:14px}
+.mbox p{font-family:var(--fB);color:var(--w2);font-size:1rem;margin-bottom:28px;line-height:1.8}
+.mclose{
+  font-family:var(--fD);font-size:1rem;letter-spacing:.2em;
+  padding:12px 40px;background:var(--r1);border:none;color:#fff;
+  cursor:pointer;text-transform:uppercase;
+  transition:background .2s,box-shadow .2s;
 }
-.modal-close:hover{background:var(--red-bright)}
+.mclose:hover{background:var(--r2);box-shadow:var(--glow)}
 
-/* ── CONFETTI CANVAS ── */
-#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:998;pointer-events:none;display:none}
+/* ═══════════════ CONFETTI ═══════════════ */
+#cfx{position:fixed;inset:0;z-index:8999;pointer-events:none;display:none}
 
-/* ── STATS STRIP ── */
+/* ═══════════════ STATS ═══════════════ */
 .stats-strip{
-  background:linear-gradient(90deg,transparent,rgba(80,0,0,0.25),transparent);
-  border-top:1px solid rgba(204,0,0,0.2);
-  border-bottom:1px solid rgba(204,0,0,0.2);
-  padding:40px 20px;
-  text-align:center;
+  border-top:1px solid rgba(204,0,0,0.15);
+  border-bottom:1px solid rgba(204,0,0,0.15);
+  padding:50px 20px;text-align:center;
+  background:rgba(15,0,0,0.5);
+  position:relative;overflow:hidden;
 }
-.stat-num{
-  font-family:var(--font-display);
-  font-size:clamp(3rem,8vw,6rem);
-  font-weight:900;color:var(--red);
-  text-shadow:var(--glow);
-  line-height:1;display:block;
+.stats-strip::before{
+  content:'71';
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--fD);font-size:20rem;color:rgba(204,0,0,0.03);
+  line-height:1;pointer-events:none;letter-spacing:0;
 }
-.stat-label{font-family:var(--font-body);font-size:1.1rem;color:var(--gold);letter-spacing:.2em;margin-top:8px;display:block;font-weight:600}
+.snum{font-family:var(--fD);font-size:clamp(4rem,10vw,8rem);color:var(--r1);line-height:1;text-shadow:var(--glow);display:block}
+.slbl{font-family:var(--fM);font-size:.75rem;color:var(--g);letter-spacing:.4em;margin-top:10px;display:block}
 
-/* ── ABOUT ── */
-.about-text{
-  max-width:750px;margin:0 auto;text-align:center;
-  font-size:1.05rem;color:var(--gray);line-height:1.9;
+/* ═══════════════ ABOUT ═══════════════ */
+.about-wrap{max-width:740px;margin:0 auto}
+.about-wrap p{font-family:var(--fB);font-size:1rem;color:var(--w2);line-height:1.95;margin-bottom:16px}
+.about-wrap strong{color:var(--r1)}
+.blood-quote{
+  border-left:2px solid var(--r1);
+  padding:20px 28px;
+  margin:32px 0;
+  background:rgba(30,0,0,0.4);
+  font-family:var(--fD);font-size:1.6rem;color:var(--w);letter-spacing:.08em;
+  position:relative;
 }
-.about-text strong{color:var(--red);font-weight:700}
+.blood-quote::before{content:'"';position:absolute;top:-10px;left:20px;font-size:3rem;color:var(--r1);line-height:1}
 
-/* ── FOOTER ── */
+/* ═══════════════ DIVIDER ═══════════════ */
+.sep{height:1px;background:linear-gradient(90deg,transparent,rgba(204,0,0,0.3),rgba(255,215,0,0.15),rgba(204,0,0,0.3),transparent);border:none;margin:0}
+
+/* ═══════════════ FOOTER ═══════════════ */
 footer{
-  text-align:center;padding:36px 20px;
-  border-top:1px solid rgba(204,0,0,0.2);
-  color:rgba(170,170,170,0.5);
-  font-size:.85rem;letter-spacing:.1em;
-  font-family:var(--font-body);
+  text-align:center;padding:44px 20px;
+  background:rgba(5,0,0,0.8);
+  border-top:1px solid rgba(204,0,0,0.15);
+  position:relative;
 }
-footer span{color:var(--red)}
+footer p{font-family:var(--fM);font-size:.72rem;color:var(--w3);letter-spacing:.15em;line-height:2.2}
+footer strong{color:var(--r1)}
+.f-emblem{font-family:var(--fD);font-size:2.5rem;color:rgba(204,0,0,0.12);letter-spacing:.2em;display:block;margin-bottom:20px}
 
-/* ── SEPARATOR ── */
-.sep{
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(204,0,0,0.4),rgba(255,215,0,0.2),rgba(204,0,0,0.4),transparent);
-  margin:0;border:none;
-}
+/* ═══════════════ REVEAL ═══════════════ */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.rv.vis{opacity:1;transform:none}
+.rv2{opacity:0;transition:opacity .8s ease}
+.rv2.vis{opacity:1}
 
-/* ── SCROLL REVEAL ── */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
-.reveal.visible{opacity:1;transform:none}
-
-/* ── MOBILE TWEAKS ── */
-@media(max-width:480px){
-  .form-card{padding:24px 16px}
-  .nav-inner a{padding:12px 10px;font-size:.75rem}
-  .checkboxes-grid{grid-template-columns:1fr}
+/* ═══════════════ MOBILE ═══════════════ */
+@media(max-width:500px){
+  .form-shell{padding:28px 16px}
+  .nav-inner a{padding:13px 10px;font-size:.65rem}
+  .cgrid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<canvas id="starCanvas"></canvas>
-<div class="blood-container" id="bloodContainer"></div>
-<canvas id="confettiCanvas"></canvas>
+<!-- INTRO -->
+<div id="intro">
+  <div class="intro-lines"></div>
+  <div class="intro-emblem">CSL</div>
+  <div class="intro-sub">CONSTELAÇÃO SANGRENTA // HAGO</div>
+  <div class="intro-bar"></div>
+  <div class="intro-pct" id="pct">INICIALIZANDO...</div>
+  <button class="intro-enter" id="enterBtn" onclick="enterSite()">⚔ ENTRAR ⚔</button>
+</div>
 
-<div id="successModal">
-  <div class="modal-box">
-    <div style="font-size:3rem;margin-bottom:16px">⚔️</div>
-    <h2>✦ REGISTRO CONFIRMADO ✦</h2>
-    <p>Seu cargo foi registrado com sucesso na <strong style="color:var(--red)">Constelação Sangrenta</strong>!<br>O Líder será notificado. Bem-vindo à família.</p>
-    <div style="font-size:1.8rem;margin:18px 0">🩸👑🩸</div>
-    <button class="modal-close" onclick="closeModal()">FECHAR</button>
+<!-- BG -->
+<canvas id="bgCanvas"></canvas>
+<div class="noise"></div>
+<div class="scanlines"></div>
+<div class="drips" id="drips"></div>
+<canvas id="cfx"></canvas>
+
+<div id="modal">
+  <div class="mbox">
+    <div style="font-size:2.5rem;margin-bottom:18px">🩸</div>
+    <h2>REGISTRADO</h2>
+    <p>Seu cargo foi enviado com sucesso para a <strong style="color:var(--r1)">Constelação Sangrenta</strong>.<br>O Líder será notificado. Você está sob observação.</p>
+    <div style="font-family:var(--fM);font-size:.7rem;color:rgba(204,0,0,0.5);letter-spacing:.2em;margin-bottom:24px">// AGUARDE CONFIRMAÇÃO //</div>
+    <button class="mclose" onclick="closeM()">FECHAR</button>
   </div>
 </div>
 
 <div class="wrapper">
 
 <!-- HEADER -->
-<header>
-  <div class="header-deco">✦ — HAGO — ✦</div>
-  <div class="glitch-wrap">
-    <h1 class="glitch" data-text="✦ CONSTELAÇÃO SANGRENTA ✦">✦ CONSTELAÇÃO SANGRENTA ✦</h1>
+<header id="topo">
+  <div class="hdr-tag">x ʟcs ƨʌɴɢʀεɴтʌ˥ x</div>
+  <div class="gtitle">
+    <span>// TAG OFICIAL — HAGO //</span>
+    <div class="main" data-t="CONSTELAÇÃO SANGRENTA">CONSTELAÇÃO SANGRENTA</div>
+    <span>Família Prata &nbsp;·&nbsp; Fundada por jdp120453</span>
   </div>
-  <p class="subtitle">x ʟcs ƨʌɴɢʀεɴтʌ˥ x &nbsp;|&nbsp; Família Prata &nbsp;|&nbsp; Hago</p>
   <div class="badges">
     <div class="badge gold">👑 LÍDER: jdp120453</div>
-    <div class="badge">👥 71/160 membros</div>
+    <div class="badge hi">👥 71 / 160 Membros</div>
     <div class="badge">⚔️ TAG OFICIAL</div>
+    <div class="badge">🩸 FAMÍLIA PRATA</div>
   </div>
+  <div class="scroll-cue">ROLAR</div>
 </header>
 
-<!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="#regras">📜 Regras</a>
-    <a href="#registro">⚔️ Registro</a>
-    <a href="#sobre">🌌 Sobre</a>
+    <a href="#regras">// REGRAS</a>
+    <a href="#registro">// REGISTRO</a>
+    <a href="#sobre">// SOBRE</a>
   </div>
 </nav>
 
 <!-- REGRAS -->
-<section id="regras">
-  <h2 class="section-title reveal">📜 CÓDIGO DA CONSTELAÇÃO 📜</h2>
+<section class="sec" id="regras">
+  <h2 class="stitle rv" data-num="01">CÓDIGO <em>SANGRENTO</em>
+    <div class="stitle-line"><span></span></div>
+  </h2>
   <div class="rules-grid">
-    <div class="rule-card reveal" style="animation-delay:.05s">
-      <span class="rule-icon">🔴</span>
-      <h3>LIDER/RCT ⚖️</h3>
-      <p>Hierarquia absoluta. A palavra da liderança é lei. Desrespeito ou contestação pública resultam em <strong style="color:var(--red)">expurgo imediato</strong>. Sem discussão.</p>
+    <div class="rule-card rv" style="transition-delay:.05s">
+      <div class="rnum">01</div>
+      <h3>⚖️ LIDER / RCT</h3>
+      <p>Hierarquia absoluta. A palavra da liderança é lei incontestável. Desrespeito público a qualquer superior resulta em <strong style="color:var(--r1)">expurgo imediato</strong> sem chance de retorno.</p>
     </div>
-    <div class="rule-card reveal" style="animation-delay:.1s">
-      <span class="rule-icon">🔴</span>
-      <h3>CHECK-IN 📍</h3>
-      <p>Presença obrigatória para todos os membros. Falta sem aviso prévio é interpretada como <strong style="color:var(--red)">desinteresse</strong> e pode resultar em remoção da TAG.</p>
+    <div class="rule-card rv" style="transition-delay:.1s">
+      <div class="rnum">02</div>
+      <h3>📍 CHECK-IN</h3>
+      <p>Presença obrigatória para todos. Ausência sem aviso prévio é lida como <strong style="color:var(--r1)">desinteresse</strong> e pode resultar em remoção. A CSL não carrega inativos.</p>
     </div>
-    <div class="rule-card reveal" style="animation-delay:.15s">
-      <span class="rule-icon">🔴</span>
-      <h3>TRETAS ⚔️</h3>
-      <p>Indiretas, provocações e conflitos são <strong style="color:var(--red)">estritamente proibidos</strong>. Todos os envolvidos, independente de quem iniciou, serão punidos.</p>
+    <div class="rule-card rv" style="transition-delay:.15s">
+      <div class="rnum">03</div>
+      <h3>⚔️ TRETAS</h3>
+      <p>Indiretas, provocações e conflitos internos são <strong style="color:var(--r1)">proibidos</strong>. Sem exceção: todos os envolvidos são punidos, não importa quem iniciou.</p>
     </div>
-    <div class="rule-card reveal" style="animation-delay:.2s">
-      <span class="rule-icon">🔴</span>
-      <h3>PROBLEMAS 🤫</h3>
-      <p>O que acontece na CSL, <strong style="color:var(--red)">fica na CSL</strong>. Vazamento de informações internas é considerado traição e punido com severidade máxima.</p>
+    <div class="rule-card rv" style="transition-delay:.2s">
+      <div class="rnum">04</div>
+      <h3>🤫 SIGILO</h3>
+      <p>O que acontece na CSL, <strong style="color:var(--r1)">fica na CSL</strong>. Vazamento de informações internas é traição de grau máximo — punição máxima garantida.</p>
     </div>
-    <div class="rule-card reveal" style="animation-delay:.25s">
-      <span class="rule-icon">🔴</span>
-      <h3>POSTURA 💪</h3>
-      <p>Presença e atitude <strong style="color:var(--red)">SEMPRE</strong>. Apatia, indiferença e falta de engajamento não têm espaço na Constelação Sangrenta.</p>
+    <div class="rule-card rv" style="transition-delay:.25s">
+      <div class="rnum">05</div>
+      <h3>💪 POSTURA</h3>
+      <p>Atitude e presença <strong style="color:var(--r1)">sempre</strong>. Apatia, indiferença e falta de engajamento não têm espaço aqui. Ou você está dentro, ou está fora.</p>
     </div>
-    <div class="rule-card reveal" style="animation-delay:.3s">
-      <span class="rule-icon">🔴</span>
-      <h3>LEALDADE 🤝</h3>
-      <p>A base de tudo. A lealdade à família é sagrada e inegociável. <strong style="color:var(--red)">Traição = SEM PERDÃO.</strong> Nenhuma chance. Nunca.</p>
+    <div class="rule-card rv" style="transition-delay:.3s">
+      <div class="rnum">06</div>
+      <h3>🤝 LEALDADE</h3>
+      <p>A base de tudo. Sagrada e inegociável. <strong style="color:var(--r1)">Traição = SEM PERDÃO</strong>. Nenhuma segunda chance. A Constelação não esquece.</p>
     </div>
   </div>
 </section>
@@ -422,423 +610,371 @@ footer span{color:var(--red)}
 <hr class="sep">
 
 <!-- FORMULÁRIO -->
-<section id="registro" style="max-width:900px">
-  <h2 class="section-title reveal">⚔️ REGISTRO DE CARGO — CSL ⚔️</h2>
-  <div class="form-card reveal">
-    <form id="cargoForm" novalidate>
-      <div class="form-grid">
+<section class="sec" id="registro">
+  <h2 class="stitle rv" data-num="02">REGISTRO <em>DE CARGO</em>
+    <div class="stitle-line"><span></span></div>
+  </h2>
+  <div class="form-shell rv">
+    <form id="cslForm" novalidate>
+      <div class="fgrid">
 
-        <!-- Nick -->
-        <div class="form-group">
-          <label for="nick">Nick no Hago *</label>
-          <input type="text" id="nick" placeholder="Seu nick no Hago" required>
-          <span class="err" id="err-nick">Campo obrigatório.</span>
+        <div class="fg">
+          <label class="fl" for="nick">Nick no Hago</label>
+          <input type="text" id="nick" placeholder="Seu nick" required>
+          <span class="err" id="e-nick">Campo obrigatório.</span>
         </div>
 
-        <!-- ID -->
-        <div class="form-group">
-          <label for="hagoid">ID no Hago *</label>
-          <input type="text" id="hagoid" placeholder="Seu ID no Hago" required>
-          <span class="err" id="err-hagoid">Campo obrigatório.</span>
+        <div class="fg">
+          <label class="fl" for="hid">ID no Hago</label>
+          <input type="text" id="hid" placeholder="Seu ID" required>
+          <span class="err" id="e-hid">Campo obrigatório.</span>
         </div>
 
-        <!-- Nível -->
-        <div class="form-group">
-          <label for="nivel">Nível no Hago</label>
-          <input type="number" id="nivel" placeholder="Ex: 45" min="1">
+        <div class="fg">
+          <label class="fl" for="nlvl">Nível no Hago</label>
+          <input type="number" id="nlvl" placeholder="Ex: 50" min="1">
         </div>
 
-        <!-- Família -->
-        <div class="form-group">
-          <label for="familia">Família/Rank</label>
+        <div class="fg">
+          <label class="fl" for="familia">Família / Rank</label>
           <select id="familia">
-            <option value="">— Selecione —</option>
-            <option>Família Bronze</option>
-            <option>Família Prata</option>
-            <option>Família Ouro</option>
-            <option>Família Platina</option>
-            <option>Família Diamante</option>
-            <option>Família Mestre</option>
-            <option>Família Grão-Mestre</option>
-            <option>Família Desafiante</option>
-            <option>Família Radiante</option>
-            <option>Família Imortal</option>
-            <option>Família Lendário</option>
+            <option value="">— Selecionar —</option>
+            <option>Bronze</option><option>Prata</option><option>Ouro</option>
+            <option>Platina</option><option>Diamante</option><option>Mestre</option>
+            <option>Grão-Mestre</option><option>Desafiante</option>
+            <option>Radiante</option><option>Imortal</option><option>Lendário</option>
           </select>
         </div>
 
-        <!-- Tempo na TAG -->
-        <div class="form-group">
-          <label for="tempo">Tempo na TAG</label>
+        <div class="fg">
+          <label class="fl" for="tempo">Tempo na TAG</label>
           <select id="tempo">
-            <option value="">— Selecione —</option>
-            <option>Menos de 1 semana</option>
-            <option>1-2 semanas</option>
-            <option>1 mês</option>
-            <option>2-3 meses</option>
-            <option>3-6 meses</option>
-            <option>6 meses - 1 ano</option>
-            <option>Mais de 1 ano</option>
-            <option>Fundador</option>
+            <option value="">— Selecionar —</option>
+            <option>Menos de 1 semana</option><option>1–2 semanas</option>
+            <option>1 mês</option><option>2–3 meses</option><option>3–6 meses</option>
+            <option>6 meses – 1 ano</option><option>Mais de 1 ano</option><option>Fundador</option>
           </select>
         </div>
 
-        <!-- Cargo -->
-        <div class="form-group full">
-          <label for="cargo">Cargo na CSL *</label>
-          <select id="cargo" required size="1">
-            <option value="">— Selecione seu cargo —</option>
-            <optgroup label="👑 HIERARQUIA MÁXIMA">
-              <option>👑 LÍDER SUPREMO</option>
-              <option>👑 CO-LÍDER</option>
-              <option>🔱 SUB-LÍDER</option>
-              <option>⚖️ RCT</option>
-              <option>🛡️ CONSELHEIRO SUPREMO</option>
-              <option>🌟 EMBAIXADOR DA CSL</option>
-            </optgroup>
-            <optgroup label="🔴 HIERARQUIA ALTA">
-              <option>🔴 CAPITÃO GERAL</option>
-              <option>🔴 VICE-CAPITÃO GERAL</option>
-              <option>⚔️ COMANDANTE DE GUERRA</option>
-              <option>🗡️ VICE-COMANDANTE</option>
-              <option>🎯 ESTRATEGISTA CHEFE</option>
-              <option>🏆 CAMPEÃO DA TAG</option>
-              <option>🥇 VICE-CAMPEÃO</option>
-              <option>🎖️ GENERAL DE BATALHA</option>
-              <option>🛡️ GUARDIÃO SUPREMO</option>
-              <option>🌙 SOMBRA DA NOITE</option>
-              <option>💀 CEIFADOR</option>
-              <option>🩸 SANGUE REAL</option>
-              <option>⭐ ESTRELA SANGRENTA</option>
-              <option>🔥 CHAMA ETERNA</option>
-              <option>💎 DIAMANTE NEGRO</option>
-            </optgroup>
-            <optgroup label="📋 ADMINISTRAÇÃO">
-              <option>📋 ADMINISTRADOR GERAL</option>
-              <option>📋 VICE-ADMINISTRADOR</option>
-              <option>📊 GESTOR DE MEMBROS</option>
-              <option>📊 VICE-GESTOR</option>
-              <option>🗂️ SECRETÁRIO GERAL</option>
-              <option>📝 SECRETÁRIO ADJUNTO</option>
-              <option>📣 PORTA-VOZ OFICIAL</option>
-              <option>📣 VICE-PORTA-VOZ</option>
-              <option>🧮 CONTADOR DE MEMBROS</option>
-              <option>📈 ANALISTA DE DESEMPENHO</option>
-              <option>📉 MONITOR DE ATIVIDADE</option>
-              <option>🗳️ FISCAL DE CHECK-IN</option>
-              <option>📅 RESPONSÁVEL DE AGENDA</option>
-              <option>🗓️ COORDENADOR DE EVENTOS</option>
-              <option>📌 ORGANIZADOR DE REUNIÕES</option>
-              <option>🔔 NOTIFICADOR OFICIAL</option>
-              <option>📢 DIVULGADOR INTERNO</option>
-              <option>📤 DIVULGADOR EXTERNO</option>
-            </optgroup>
-            <optgroup label="🤝 RECRUTAMENTO E RELAÇÕES">
-              <option>🤝 RECRUTADOR CHEFE</option>
-              <option>🤝 VICE-RECRUTADOR</option>
-              <option>🎯 CAÇADOR DE TALENTOS</option>
-              <option>🎯 EXPLORADOR DE MEMBROS</option>
-              <option>🌐 EMBAIXADOR EXTERNO</option>
-              <option>🌐 REPRESENTANTE DE ALIANÇAS</option>
-              <option>🤲 NEGOCIADOR DE ALIANÇAS</option>
-              <option>🕊️ DIPLOMATA DA CSL</option>
-              <option>🤝 RELAÇÕES PÚBLICAS</option>
-              <option>📡 COMUNICADOR EXTERNO</option>
-              <option>🗺️ EXPLORADOR DE FAMÍLIAS</option>
-              <option>🔍 ANALISTA DE RIVAIS</option>
-              <option>🕵️ ESPIÃO EXTERNO</option>
-              <option>🕵️ CONTRA-ESPIÃO</option>
-              <option>🧭 NAVEGADOR ESTRATÉGICO</option>
-            </optgroup>
-            <optgroup label="🎓 TREINAMENTO">
-              <option>🎓 TREINADOR CHEFE</option>
-              <option>🎓 VICE-TREINADOR</option>
-              <option>📚 PROFESSOR OFICIAL</option>
-              <option>📚 PROFESSOR ADJUNTO</option>
-              <option>🏋️ PREPARADOR FÍSICO</option>
-              <option>🏋️ ASSISTENTE DE TREINO</option>
-              <option>🎮 COACH DE GAMEPLAY</option>
-              <option>🎮 ANALISTA DE GAMEPLAY</option>
-              <option>🧠 ESTRATEGISTA DE TREINO</option>
-              <option>🧠 PLANEJADOR DE SESSÕES</option>
-              <option>🏅 AVALIADOR DE MEMBROS</option>
-              <option>📊 MONITOR DE PROGRESSO</option>
-              <option>🎯 INSTRUTOR DE MIRA</option>
-              <option>⚔️ MESTRE DE COMBATE</option>
-              <option>🛡️ INSTRUTOR DE DEFESA</option>
-              <option>💡 MENTOR OFICIAL</option>
-              <option>💡 MENTOR ADJUNTO</option>
-              <option>🌱 TUTOR DE NOVATOS</option>
-              <option>🌱 GUIA DE INICIANTES</option>
-              <option>🎪 ANIMADOR DE TREINOS</option>
+        <div class="fg">
+          <label class="fl" for="cargo">Cargo na CSL *</label>
+          <select id="cargo" required>
+            <option value="">— Selecionar cargo —</option>
+            <optgroup label="⚙️ OPERAÇÕES TÉCNICAS">
+              <option>🖥️ Criador de Scripts</option>
+              <option>🖥️ Desenvolvedor da TAG</option>
+              <option>🔧 Técnico de Sistemas</option>
+              <option>🔧 Suporte Técnico</option>
             </optgroup>
             <optgroup label="🔒 SEGURANÇA E DISCIPLINA">
-              <option>🔒 CHEFE DE SEGURANÇA</option>
-              <option>🔒 VICE-CHEFE DE SEGURANÇA</option>
-              <option>🚨 GUARDIÃO DA ORDEM</option>
-              <option>🚨 ASSISTENTE DE SEGURANÇA</option>
-              <option>⚖️ JUIZ INTERNO</option>
-              <option>⚖️ PROMOTOR DE JUSTIÇA</option>
-              <option>🔨 APLICADOR DE REGRAS</option>
-              <option>🔨 ASSISTENTE DISCIPLINAR</option>
-              <option>🚫 EXECUTOR DE PUNIÇÕES</option>
-              <option>🚫 SUPERVISOR DE PUNIÇÕES</option>
-              <option>👁️ VIGIA DA TAG</option>
-              <option>👁️ OBSERVADOR INTERNO</option>
-              <option>🕵️ INVESTIGADOR DE TRETAS</option>
-              <option>🕵️ DETETIVE INTERNO</option>
-              <option>🚔 POLICIAL DA CSL</option>
-              <option>🚔 GUARDA INTERNO</option>
-              <option>🔐 PROTETOR DE SEGREDOS</option>
-              <option>🔐 GUARDIÃO DE INFORMAÇÕES</option>
-              <option>🛡️ ESCUDO DA TAG</option>
-              <option>🛡️ PROTETOR DE MEMBROS</option>
+              <option>⚖️ Aplicador de Punições</option>
+              <option>🔍 Investigador de Tretas</option>
+              <option>🤝 Resolvedor de Tretas</option>
+              <option>👁️ Vigilante</option>
+              <option>👁️ Observador Interno</option>
+              <option>🕵️ Contra-Espião</option>
+              <option>🔐 Guardião de Segredos</option>
+              <option>🛡️ Protetor de Membros</option>
+              <option>🚔 Guarda Interno</option>
+              <option>⚖️ Juiz Interno</option>
+            </optgroup>
+            <optgroup label="🎓 TREINAMENTO">
+              <option>🎓 Treinador Chefe</option>
+              <option>📚 Professor Oficial</option>
+              <option>🎮 Coach de Gameplay</option>
+              <option>💡 Mentor Oficial</option>
+              <option>🌱 Tutor de Novatos</option>
+              <option>🌱 Guia de Iniciantes</option>
+              <option>⚔️ Mestre de Combate</option>
+              <option>🛡️ Instrutor de Defesa</option>
+            </optgroup>
+            <optgroup label="🤝 RECRUTAMENTO E RELAÇÕES">
+              <option>🤝 Recrutador</option>
+              <option>🎯 Caçador de Talentos</option>
+              <option>🕊️ Diplomata</option>
+              <option>🌐 Representante de Alianças</option>
+              <option>🔍 Analista de Rivais</option>
+              <option>🗺️ Explorador de Famílias</option>
             </optgroup>
             <optgroup label="🎉 EVENTOS E ENTRETENIMENTO">
-              <option>🎉 ORGANIZADOR DE EVENTOS</option>
-              <option>🎉 CO-ORGANIZADOR</option>
-              <option>🎮 MESTRE DOS JOGOS</option>
-              <option>🎮 ASSISTENTE DE JOGOS</option>
-              <option>🏆 ÁRBITRO DE TORNEIOS</option>
-              <option>🏆 JUIZ DE COMPETIÇÕES</option>
-              <option>🎯 COORDENADOR DE TORNEIOS</option>
-              <option>🎯 ASSISTENTE DE TORNEIOS</option>
-              <option>🎪 ANIMADOR DE EVENTOS</option>
-              <option>🎪 ANIMADOR AUXILIAR</option>
-              <option>🎭 APRESENTADOR OFICIAL</option>
-              <option>🎭 CO-APRESENTADOR</option>
-              <option>🎵 DJ DA CSL</option>
-              <option>🎵 ASSISTENTE DE MÚSICA</option>
-              <option>🎨 DECORADOR DE EVENTOS</option>
-              <option>📸 FOTÓGRAFO OFICIAL</option>
-              <option>🎬 CINEGRAFISTA DA CSL</option>
-              <option>🎬 EDITOR DE VÍDEOS</option>
-              <option>📺 STREAMER OFICIAL</option>
-              <option>📺 CO-STREAMER</option>
-              <option>🎙️ COMENTARISTA OFICIAL</option>
-              <option>🎙️ NARRADOR OFICIAL</option>
-              <option>🔊 LOCUTOR DA CSL</option>
+              <option>🎉 Organizador de Eventos</option>
+              <option>🏆 Árbitro de Torneios</option>
+              <option>🎪 Animador de Eventos</option>
+              <option>🎵 DJ da CSL</option>
+              <option>📸 Fotógrafo Oficial</option>
+              <option>🎬 Editor de Vídeos</option>
+              <option>🎙️ Narrador Oficial</option>
+              <option>📺 Streamer Oficial</option>
             </optgroup>
-            <optgroup label="📱 COMUNICAÇÃO E MÍDIA">
-              <option>📱 GERENTE DE REDES SOCIAIS</option>
-              <option>📱 ASSISTENTE DE REDES</option>
-              <option>✍️ REDATOR OFICIAL</option>
-              <option>✍️ REDATOR AUXILIAR</option>
-              <option>🖼️ DESIGNER GRÁFICO</option>
-              <option>🖼️ DESIGNER AUXILIAR</option>
-              <option>📰 JORNALISTA DA CSL</option>
-              <option>📰 REPÓRTER INTERNO</option>
-              <option>📡 TRANSMISSOR DE NOTÍCIAS</option>
-              <option>📡 EDITOR DE NOTÍCIAS</option>
-              <option>🗞️ CRONISTA DA CSL</option>
-              <option>🗞️ HISTORIADOR OFICIAL</option>
-              <option>📖 ARQUIVISTA</option>
-              <option>📖 BIBLIOTECÁRIO</option>
-              <option>💬 MODERADOR DE CHAT</option>
-              <option>💬 ASSISTENTE DE MODERAÇÃO</option>
-              <option>📌 ANUNCIADOR OFICIAL</option>
-            </optgroup>
-            <optgroup label="💰 FINANÇAS E RECURSOS">
-              <option>💰 TESOUREIRO GERAL</option>
-              <option>💰 VICE-TESOUREIRO</option>
-              <option>💳 GESTOR DE RECURSOS</option>
-              <option>💳 ASSISTENTE FINANCEIRO</option>
-              <option>📦 GERENTE DE ESTOQUE</option>
-              <option>📦 CONTROLADOR DE ITENS</option>
-              <option>🎁 DISTRIBUIDOR DE RECOMPENSAS</option>
-              <option>🎁 ASSISTENTE DE PRÊMIOS</option>
-              <option>🏅 GERENTE DE MEDALHAS</option>
-              <option>💎 AVALIADOR DE RARIDADES</option>
-              <option>🛒 RESPONSÁVEL DE COMPRAS</option>
+            <optgroup label="📢 COMUNICAÇÃO E MÍDIA">
+              <option>📱 Gerente de Redes Sociais</option>
+              <option>✍️ Redator Oficial</option>
+              <option>🖼️ Designer Gráfico</option>
+              <option>📰 Jornalista da CSL</option>
+              <option>💬 Moderador de Chat</option>
+              <option>📌 Anunciador Oficial</option>
             </optgroup>
             <optgroup label="⚔️ COMBATE E GUERRA">
-              <option>⚔️ GUERREIRO DE ELITE</option>
-              <option>⚔️ GUERREIRO VETERANO</option>
-              <option>⚔️ GUERREIRO EXPERIENTE</option>
-              <option>⚔️ GUERREIRO TREINADO</option>
-              <option>⚔️ GUERREIRO INICIANTE</option>
-              <option>🗡️ ESPADACHIM SUPREMO</option>
-              <option>🗡️ ESPADACHIM DE ELITE</option>
-              <option>🏹 ARQUEIRO SUPREMO</option>
-              <option>🏹 ARQUEIRO DE ELITE</option>
-              <option>🛡️ DEFENSOR SUPREMO</option>
-              <option>🛡️ DEFENSOR DE ELITE</option>
-              <option>💣 BOMBARDEIRO SUPREMO</option>
-              <option>🔱 LANCEIRO SUPREMO</option>
-              <option>⚡ RELÂMPAGO DE GUERRA</option>
-              <option>⚡ TROVÃO DE BATALHA</option>
-              <option>🌪️ FURACÃO SANGUE</option>
-              <option>🔥 CHAMA GUERREIRA</option>
-              <option>💀 CEIFADOR DE ALMAS</option>
-              <option>💀 DESTRUIDOR SUPREMO</option>
-              <option>🩸 MANCHADO DE SANGUE</option>
-              <option>☠️ TERROR DA GUERRA</option>
-              <option>☠️ MESTRE DA DESTRUIÇÃO</option>
+              <option>⚔️ Guerreiro de Elite</option>
+              <option>⚔️ Guerreiro Veterano</option>
+              <option>🗡️ Espadachim Supremo</option>
+              <option>🏹 Arqueiro de Elite</option>
+              <option>💀 Ceifador de Almas</option>
+              <option>🩸 Manchado de Sangue</option>
+              <option>⚡ Relâmpago de Guerra</option>
+              <option>🔥 Chama Guerreira</option>
             </optgroup>
-            <optgroup label="🌟 TÍTULOS DE HONRA">
-              <option>🌟 LENDA DA CSL</option>
-              <option>🌟 MITO DA CSL</option>
-              <option>🌟 ÍCONE DA CSL</option>
-              <option>👑 REI/RAINHA DA CSL</option>
-              <option>👑 PRÍNCIPE/PRINCESA DA CSL</option>
-              <option>🏆 CAMPEÃO ETERNO</option>
-              <option>🏆 CAMPEÃO INVICTO</option>
-              <option>🎖️ HERÓI DA CSL</option>
-              <option>🎖️ HERÓI DE GUERRA</option>
-              <option>🥇 OURO PURO</option>
-              <option>🏅 MEDALHISTA DE HONRA</option>
-              <option>⭐ ESTRELA MAIOR</option>
-              <option>⭐ ESTRELA SUPREMA</option>
-              <option>💎 DIAMANTE REAL</option>
-              <option>💎 SAFIRA ETERNA</option>
-              <option>🔮 CRISTAL SAGRADO</option>
-              <option>🔮 JÓIA DA CONSTELAÇÃO</option>
-              <option>🌙 LUA CHEIA</option>
-              <option>🌙 ECLIPSE SANGRENTO</option>
-              <option>☀️ SOL NEGRO</option>
-              <option>☀️ AURORA VERMELHA</option>
-              <option>🌌 GALÁXIA DE SANGUE</option>
-              <option>🌌 NEBULOSA ETERNA</option>
-              <option>🌠 COMETA DA CSL</option>
-              <option>🌠 METEORO SANGRENTO</option>
-              <option>🪐 PLANETA GUERREIRO</option>
-              <option>🪐 ÓRBITA DE FOGO</option>
+            <optgroup label="🌱 NOVATOS">
+              <option>🌱 Novo Membro</option>
+              <option>🌿 Membro em Teste</option>
+              <option>🌾 Aspirante a Membro</option>
+              <option>🍃 Aprendiz de Guerreiro</option>
+              <option>🌸 Flor da Constelação</option>
             </optgroup>
             <optgroup label="🎭 CARGOS ESPECIAIS">
-              <option>🎭 PALHAÇO DA TAG</option>
-              <option>🃏 CORINGA DA CSL</option>
-              <option>😈 DEMÔNIO DA CSL</option>
-              <option>🦅 ÁGUIA DA CSL</option>
-              <option>🦅 FALCÃO GUERREIRO</option>
-              <option>🐺 LOBO DA CONSTELAÇÃO</option>
-              <option>🐺 LOBO SOLITÁRIO</option>
-              <option>🦁 LEÃO DE SANGUE</option>
-              <option>🦁 TIGRE DA GUERRA</option>
-              <option>🐉 DRAGÃO SANGRENTO</option>
-              <option>🐉 DRAGÃO DE FOGO</option>
-              <option>🦊 RAPOSA ASTUTA</option>
-              <option>🦂 ESCORPIÃO DA CSL</option>
-              <option>🐍 COBRA TRAIÇOEIRA</option>
-              <option>🕷️ ARANHA DA REDE</option>
-              <option>🦇 MORCEGO NOTURNO</option>
+              <option>🃏 Coringa da CSL</option>
+              <option>🐺 Lobo Solitário</option>
+              <option>🐉 Dragão Sangrento</option>
+              <option>🦂 Escorpião da CSL</option>
+              <option>🦇 Morcego Noturno</option>
+              <option>😈 Demônio da CSL</option>
             </optgroup>
-            <optgroup label="🌱 NOVATOS E PROSPECTOS">
-              <option>🌱 NOVATO INICIANTE</option>
-              <option>🌱 NOVO MEMBRO</option>
-              <option>🌿 MEMBRO EM TESTE</option>
-              <option>🌿 PROSPECTO OFICIAL</option>
-              <option>🌾 CANDIDATO À CSL</option>
-              <option>🌾 ASPIRANTE A MEMBRO</option>
-              <option>🍃 APRENDIZ DA TAG</option>
-              <option>🍃 APRENDIZ DE GUERREIRO</option>
-              <option>🌻 SEMENTE DA CSL</option>
-              <option>🌸 FLOR DA CONSTELAÇÃO</option>
-              <option>🍀 TREVO DA SORTE</option>
-              <option>🌺 NOVO AMANHECER</option>
-            </optgroup>
-            <optgroup label="🏛️ CARGOS HONORÁRIOS">
-              <option>🏛️ MEMBRO HONORÁRIO</option>
-              <option>🏛️ VETERANO HONORÁRIO</option>
-              <option>🎗️ CONDECORADO DA CSL</option>
-              <option>🏺 RELÍQUIA DA TAG</option>
-              <option>📜 PERGAMINHO VIVO</option>
-              <option>📜 HISTÓRIA AMBULANTE</option>
-              <option>🗿 MONUMENTO DA CSL</option>
-              <option>🔱 TRIDENTE DE OURO</option>
+            <optgroup label="🏛️ HONORÁRIOS">
+              <option>🏛️ Membro Honorário</option>
+              <option>🏛️ Veterano Honorário</option>
+              <option>🎗️ Condecorado da CSL</option>
+              <option>📜 História Ambulante</option>
             </optgroup>
           </select>
-          <span class="err" id="err-cargo">Selecione um cargo.</span>
+          <span class="err" id="e-cargo">Selecione um cargo.</span>
         </div>
 
-        <!-- Função Principal -->
-        <div class="form-group full">
-          <label for="funcao">Função Principal *</label>
-          <select id="funcao" required>
-            <option value="">— Selecione sua função —</option>
-            <optgroup label="🏛️ LIDERANÇA">
-              <option>Tomar decisões finais</option>
-              <option>Resolver conflitos internos</option>
-              <option>Administrar membros</option>
-              <option>Aplicar punições</option>
-              <option>Fazer reuniões gerais</option>
-              <option>Definir estratégias da TAG</option>
-              <option>Representar a TAG externamente</option>
-              <option>Negociar alianças</option>
-              <option>Criar regras</option>
-              <option>Modificar regras</option>
+        <!-- FUNÇÕES — máx 3 -->
+        <div class="fg full">
+          <label class="fl">Funções (máximo 3)</label>
+          <div class="limit-note">// Selecione entre 1 e 3 funções. Após 3 seleções, as demais serão bloqueadas.</div>
+          <div class="func-tags" id="funcTags"></div>
+          <select id="funcSel" onchange="addFunc(this)">
+            <option value="">— Adicionar função —</option>
+
+            <optgroup label="🖥️ TÉCNICO / SCRIPTS">
+              <option>Criar scripts para a TAG</option>
+              <option>Desenvolver ferramentas internas</option>
+              <option>Manter sistemas da CSL</option>
+              <option>Criar bots de automação</option>
+              <option>Suporte técnico aos membros</option>
+              <option>Testar novas ferramentas</option>
+              <option>Documentar processos técnicos</option>
+              <option>Criar planilhas de controle</option>
+              <option>Monitorar estabilidade dos sistemas</option>
+              <option>Criar formulários internos</option>
+              <option>Desenvolver sistemas de pontuação</option>
+              <option>Criar dashboards de desempenho</option>
+              <option>Auditar registros internos</option>
+              <option>Backup de dados da TAG</option>
+              <option>Criar alertas automáticos</option>
             </optgroup>
-            <optgroup label="📋 ADMINISTRAÇÃO">
-              <option>Organizar check-ins</option>
-              <option>Controlar lista de membros</option>
-              <option>Fazer relatórios de atividade</option>
-              <option>Agendar eventos</option>
-              <option>Gerenciar convites</option>
-              <option>Remover membros inativos</option>
-              <option>Registrar novos membros</option>
-              <option>Arquivar dados</option>
-              <option>Monitorar frequência</option>
-              <option>Atualizar quadro da família</option>
+
+            <optgroup label="⚖️ APLICAR PUNIÇÕES">
+              <option>Aplicar punições a membros infratores</option>
+              <option>Registrar punições aplicadas</option>
+              <option>Comunicar punições ao líder</option>
+              <option>Escalar casos graves à liderança</option>
+              <option>Monitorar comportamento pós-punição</option>
+              <option>Revisar histórico disciplinar</option>
+              <option>Propor gradação de punições</option>
+              <option>Executar expurgos autorizados</option>
+              <option>Comunicar expurgos ao grupo</option>
+              <option>Documentar infrações ocorridas</option>
+              <option>Notificar membros advertidos</option>
+              <option>Registrar advertências formais</option>
+              <option>Emitir última advertência</option>
+              <option>Suspender temporariamente membros</option>
+              <option>Reabilitar membros após punição</option>
             </optgroup>
+
+            <optgroup label="🔍 INVESTIGAR TRETAS">
+              <option>Investigar tretas entre membros</option>
+              <option>Coletar relatos e evidências</option>
+              <option>Ouvir todas as partes envolvidas</option>
+              <option>Analisar contexto dos conflitos</option>
+              <option>Montar dossiê de investigação</option>
+              <option>Identificar o causador do conflito</option>
+              <option>Reportar achados à liderança</option>
+              <option>Monitorar histórico de conflitos</option>
+              <option>Cruzar informações e depoimentos</option>
+              <option>Determinar grau de responsabilidade</option>
+              <option>Investigar falsas acusações</option>
+              <option>Verificar screenshots e provas</option>
+              <option>Apurar vazamentos internos</option>
+              <option>Identificar provocadores ocultos</option>
+              <option>Rastrear origem de fofocas</option>
+            </optgroup>
+
+            <optgroup label="🤝 RESOLVER TRETAS">
+              <option>Mediar conflitos entre membros</option>
+              <option>Propor acordos entre as partes</option>
+              <option>Facilitar conversas difíceis</option>
+              <option>Negociar treguas internas</option>
+              <option>Acompanhar resolução de conflitos</option>
+              <option>Garantir cumprimento dos acordos</option>
+              <option>Prevenir reincidência de conflitos</option>
+              <option>Criar canal seguro para resolução</option>
+              <option>Documentar acordos firmados</option>
+              <option>Envolver liderança quando necessário</option>
+              <option>Restaurar relações entre membros</option>
+              <option>Comunicar resolução ao grupo</option>
+              <option>Propor reconciliação formal</option>
+              <option>Monitorar clima após a resolução</option>
+              <option>Fechar casos com relatório</option>
+            </optgroup>
+
+            <optgroup label="👁️ VIGILANTE">
+              <option>Monitorar chat em tempo real</option>
+              <option>Identificar comportamentos suspeitos</option>
+              <option>Reportar infrações à liderança</option>
+              <option>Vigiar horários de pico</option>
+              <option>Checar presença nos check-ins</option>
+              <option>Alertar sobre linguagem inapropriada</option>
+              <option>Monitorar interações entre membros</option>
+              <option>Observar padrões de comportamento</option>
+              <option>Detectar desrespeito velado</option>
+              <option>Identificar membros problemáticos</option>
+              <option>Vigiar grupos paralelos suspeitos</option>
+              <option>Registrar logs de comportamento</option>
+              <option>Fiscalizar cumprimento das regras</option>
+              <option>Alertar sobre possíveis tretas antes de eclodirem</option>
+              <option>Monitorar novatos no período de teste</option>
+              <option>Vigiar membros advertidos</option>
+              <option>Criar relatório semanal de vigilância</option>
+              <option>Identificar infiltrados externos</option>
+              <option>Reportar movimentações suspeitas</option>
+              <option>Manter sigilo absoluto nas operações</option>
+            </optgroup>
+
+            <optgroup label="👁️ OBSERVADOR INTERNO">
+              <option>Espionar comportamento de membros comuns</option>
+              <option>Reportar desvios de conduta</option>
+              <option>Monitorar conversas privadas autorizadas</option>
+              <option>Identificar potenciais traidores</option>
+              <option>Observar sem revelar identidade</option>
+              <option>Criar perfil comportamental de membros</option>
+              <option>Detectar alinhamentos suspeitos</option>
+              <option>Mapear relações entre membros</option>
+              <option>Identificar quem compartilha informações externas</option>
+              <option>Monitorar membros silenciosos</option>
+              <option>Observar mudanças de comportamento</option>
+              <option>Rastrear vazamentos internos</option>
+              <option>Alertar sobre presença de espiões</option>
+              <option>Documentar observações em sigilo</option>
+              <option>Reportar exclusivamente à liderança</option>
+              <option>Manter anonimato operacional</option>
+              <option>Cruzar dados com o Vigilante</option>
+              <option>Identificar membros em desacordo oculto</option>
+              <option>Detectar planos de abandono da TAG</option>
+              <option>Mapear influências negativas internas</option>
+            </optgroup>
+
+            <optgroup label="🎓 TREINAMENTO">
+              <option>Treinar membros novatos</option>
+              <option>Ensinar estratégias de jogo</option>
+              <option>Conduzir sessões de prática</option>
+              <option>Avaliar desempenho individual</option>
+              <option>Criar material de treinamento</option>
+              <option>Monitorar evolução dos membros</option>
+              <option>Dar feedback de gameplay</option>
+              <option>Organizar treinos em grupo</option>
+              <option>Testar novas táticas coletivas</option>
+              <option>Gravar sessões para análise</option>
+              <option>Identificar pontos fracos do time</option>
+              <option>Propor planos de melhoria</option>
+              <option>Criar desafios de treinamento</option>
+              <option>Acompanhar progresso de novatos</option>
+              <option>Cerificar prontidão de combate</option>
+              <option>Treinar liderança situacional</option>
+              <option>Aplicar testes de conhecimento</option>
+              <option>Ensinar regras da TAG</option>
+              <option>Preparar membros para torneios</option>
+              <option>Organizar simulações de guerra</option>
+            </optgroup>
+
             <optgroup label="🤝 RECRUTAMENTO">
               <option>Recrutar novos membros</option>
-              <option>Avaliar candidatos</option>
-              <option>Fazer entrevistas</option>
-              <option>Divulgar a TAG</option>
-              <option>Caçar talentos</option>
-              <option>Analisar perfis</option>
-              <option>Convidar jogadores</option>
+              <option>Avaliar candidatos à CSL</option>
+              <option>Fazer entrevistas de entrada</option>
+              <option>Divulgar a TAG em outros grupos</option>
+              <option>Caçar talentos no Hago</option>
+              <option>Analisar perfis de jogadores</option>
+              <option>Convidar jogadores de alta família</option>
               <option>Pesquisar famílias rivais</option>
               <option>Criar anúncios de vaga</option>
               <option>Filtrar candidatos por nível</option>
+              <option>Acompanhar membros em período de teste</option>
+              <option>Apresentar novatos à TAG</option>
+              <option>Monitorar integração de novos membros</option>
+              <option>Criar relatório de recrutamento</option>
+              <option>Prospectar alianças estratégicas</option>
             </optgroup>
-            <optgroup label="🎓 TREINAMENTO">
-              <option>Treinar membros novos</option>
-              <option>Ensinar estratégias</option>
-              <option>Fazer sessões de prática</option>
-              <option>Avaliar desempenho</option>
-              <option>Criar apostilas</option>
-              <option>Monitorar evolução</option>
-              <option>Dar feedback de gameplay</option>
-              <option>Organizar treinos em grupo</option>
-              <option>Testar novas táticas</option>
-              <option>Gravar sessões de treino</option>
+
+            <optgroup label="🌐 RELAÇÕES EXTERNAS">
+              <option>Negociar alianças com outras TAGs</option>
+              <option>Representar a CSL externamente</option>
+              <option>Manter relações diplomáticas</option>
+              <option>Comunicar posição da TAG a rivais</option>
+              <option>Criar acordos de não-agressão</option>
+              <option>Monitorar movimentações inimigas</option>
+              <option>Reportar atividades de TAGs rivais</option>
+              <option>Participar de reuniões de aliados</option>
+              <option>Renegociar acordos vigentes</option>
+              <option>Encerrar alianças quando necessário</option>
             </optgroup>
-            <optgroup label="🔒 SEGURANÇA">
-              <option>Investigar tretas</option>
-              <option>Aplicar advertências</option>
-              <option>Banir infratores</option>
-              <option>Vigiar o chat</option>
-              <option>Proteger informações da TAG</option>
-              <option>Reportar comportamentos suspeitos</option>
-              <option>Mediar conflitos</option>
-              <option>Fiscalizar regras</option>
-              <option>Monitorar membros problemáticos</option>
-              <option>Executar expurgos</option>
-            </optgroup>
+
             <optgroup label="🎉 EVENTOS">
               <option>Organizar torneios internos</option>
               <option>Criar jogos entre membros</option>
-              <option>Animar reuniões</option>
-              <option>Fazer sorteios</option>
-              <option>Premiar vencedores</option>
+              <option>Animar reuniões da TAG</option>
+              <option>Fazer sorteios de prêmios</option>
+              <option>Premiar vencedores de competições</option>
               <option>Transmitir eventos ao vivo</option>
-              <option>Comentar partidas</option>
-              <option>Narrar torneios</option>
+              <option>Comentar partidas internas</option>
+              <option>Narrar torneios da CSL</option>
               <option>Editar vídeos de eventos</option>
-              <option>Fotografar momentos</option>
+              <option>Fotografar momentos marcantes</option>
+              <option>Criar calendário de eventos</option>
+              <option>Divulgar eventos com antecedência</option>
+              <option>Gerenciar inscrições em torneios</option>
+              <option>Criar bracket de eliminatória</option>
+              <option>Registrar resultados de torneios</option>
+              <option>Entregar prêmios aos vencedores</option>
+              <option>Criar tema para eventos especiais</option>
+              <option>Organizar eventos sazonais</option>
+              <option>Gravar highlights dos eventos</option>
+              <option>Criar ranking de campeões</option>
             </optgroup>
+
             <optgroup label="📢 COMUNICAÇÃO">
               <option>Gerenciar redes sociais da TAG</option>
-              <option>Criar posts</option>
-              <option>Escrever textos oficiais</option>
-              <option>Fazer anúncios</option>
-              <option>Moderar conversas</option>
-              <option>Criar designs</option>
-              <option>Editar fotos</option>
-              <option>Escrever notícias</option>
-              <option>Criar enquetes</option>
-              <option>Fazer thumbnail</option>
+              <option>Criar posts de engajamento</option>
+              <option>Escrever textos oficiais da CSL</option>
+              <option>Fazer anúncios importantes</option>
+              <option>Moderar conversas no grupo</option>
+              <option>Criar designs para a TAG</option>
+              <option>Editar fotos e artes</option>
+              <option>Escrever notícias internas</option>
+              <option>Criar enquetes de decisão</option>
+              <option>Fazer thumbnails de vídeos</option>
+              <option>Gerenciar identidade visual da TAG</option>
+              <option>Criar banners de eventos</option>
+              <option>Desenvolver brand da CSL</option>
+              <option>Criar cartões de boas-vindas</option>
+              <option>Postar resultados de torneios</option>
+              <option>Criar conteúdo motivacional</option>
+              <option>Divulgar conquistas da TAG</option>
+              <option>Criar posts de homenagem</option>
+              <option>Gerenciar canal oficial</option>
+              <option>Criar newsletter semanal</option>
             </optgroup>
+
             <optgroup label="⚔️ COMBATE">
               <option>Liderar ataques em guerras</option>
               <option>Defender a família em batalhas</option>
@@ -847,107 +983,137 @@ footer span{color:var(--red)}
               <option>Flanquear oponentes</option>
               <option>Criar formações de batalha</option>
               <option>Coordenar ataques em equipe</option>
-              <option>Proteger aliados</option>
+              <option>Proteger aliados em combate</option>
               <option>Eliminar alvos prioritários</option>
-              <option>Garantir vitória</option>
+              <option>Garantir vitória da TAG</option>
+              <option>Analisar estratégias inimigas</option>
+              <option>Identificar pontos fracos rivais</option>
+              <option>Propor contra-ataques</option>
+              <option>Posicionar defensas</option>
+              <option>Coordenar retirada estratégica</option>
+              <option>Criar planos de emboscada</option>
+              <option>Liderar guerrilha tática</option>
+              <option>Comandar esquadrão de ataque</option>
+              <option>Proteger base da TAG</option>
+              <option>Monitorar movimentos inimigos</option>
             </optgroup>
-            <optgroup label="💙 SUPORTE">
-              <option>Ajudar membros com problemas</option>
-              <option>Responder dúvidas</option>
-              <option>Auxiliar novatos</option>
-              <option>Suporte emocional</option>
-              <option>Resolver mal-entendidos</option>
-              <option>Mediar conversas</option>
-              <option>Orientar membros</option>
-              <option>Facilitar comunicação</option>
-              <option>Ser ponto de apoio</option>
-              <option>Escutar membros</option>
+
+            <optgroup label="💙 SUPORTE E BEM-ESTAR">
+              <option>Ajudar membros com problemas pessoais</option>
+              <option>Responder dúvidas de membros</option>
+              <option>Auxiliar novatos na integração</option>
+              <option>Oferecer suporte emocional</option>
+              <option>Resolver mal-entendidos entre membros</option>
+              <option>Orientar membros desmotivados</option>
+              <option>Ser ponto de apoio da família</option>
+              <option>Escutar membros com dificuldades</option>
+              <option>Criar ambiente positivo</option>
+              <option>Mediar tensões antes de virarem tretas</option>
+              <option>Motivar membros em baixo desempenho</option>
+              <option>Celebrar conquistas dos membros</option>
+              <option>Criar vínculo entre os membros</option>
+              <option>Organizar encontros informais</option>
+              <option>Incentivar participação ativa</option>
             </optgroup>
-            <optgroup label="🎭 ESPECIAL">
-              <option>Fazer memes da TAG</option>
-              <option>Animar o grupo</option>
-              <option>Ser a alegria da família</option>
+
+            <optgroup label="📋 ADMINISTRAÇÃO">
+              <option>Organizar check-ins diários</option>
+              <option>Controlar lista de membros ativos</option>
+              <option>Fazer relatórios de atividade</option>
+              <option>Agendar eventos e reuniões</option>
+              <option>Gerenciar convites da TAG</option>
+              <option>Registrar novos membros</option>
+              <option>Arquivar dados históricos</option>
+              <option>Monitorar frequência dos membros</option>
+              <option>Atualizar quadro da família</option>
+              <option>Remover membros inativos</option>
+              <option>Criar atas de reuniões</option>
+              <option>Organizar informações da TAG</option>
+              <option>Manter registro de cargos</option>
+              <option>Controlar lista de punições</option>
+              <option>Atualizar regras internas</option>
+            </optgroup>
+
+            <optgroup label="🎭 ESPECIAL / ENTRETENIMENTO">
+              <option>Criar memes da TAG</option>
+              <option>Animar o grupo com humor</option>
+              <option>Ser a energia positiva da família</option>
               <option>Fazer zoeiras controladas</option>
-              <option>Ser o mascote da CSL</option>
               <option>Criar piadas internas</option>
               <option>Divertir os membros</option>
               <option>Criar desafios engraçados</option>
-              <option>Trazer energia positiva</option>
-              <option>Ser o palhacinho oficial</option>
+              <option>Ser o mascote da CSL</option>
+              <option>Organizar dinâmicas divertidas</option>
+              <option>Criar quadro de entretenimento semanal</option>
             </optgroup>
+
           </select>
-          <span class="err" id="err-funcao">Selecione uma função.</span>
+          <span class="err" id="e-func">Adicione pelo menos 1 função.</span>
+          <input type="hidden" id="funcHidden">
         </div>
 
-        <!-- Funções Secundárias -->
-        <div class="form-group full">
-          <label>Funções Secundárias (selecione quantas desejar)</label>
-          <div class="checkboxes-grid" id="funcoesSecundarias">
+        <!-- EXPERIÊNCIA -->
+        <div class="fg full">
+          <label class="fl">Nível de Experiência *</label>
+          <div class="radio-group">
+            <label class="ri"><input type="radio" name="exp" value="🌱 Iniciante (menos de 3 meses)"> 🌱 Iniciante — menos de 3 meses</label>
+            <label class="ri"><input type="radio" name="exp" value="⚔️ Intermediário (3–6 meses)"> ⚔️ Intermediário — 3 a 6 meses</label>
+            <label class="ri"><input type="radio" name="exp" value="🏆 Avançado (6–12 meses)"> 🏆 Avançado — 6 a 12 meses</label>
+            <label class="ri"><input type="radio" name="exp" value="👑 Veterano (mais de 1 ano)"> 👑 Veterano — mais de 1 ano</label>
+            <label class="ri"><input type="radio" name="exp" value="🌟 Lenda (Fundador / +2 anos)"> 🌟 Lenda — Fundador / mais de 2 anos</label>
+          </div>
+          <span class="err" id="e-exp">Selecione seu nível.</span>
+        </div>
+
+        <!-- DISPONIBILIDADE -->
+        <div class="fg full">
+          <label class="fl">Disponibilidade</label>
+          <div class="cgrid">
+            <label class="ci"><input type="checkbox" name="disp" value="☀️ Manhã (6h–12h)"> ☀️ Manhã (6h–12h)</label>
+            <label class="ci"><input type="checkbox" name="disp" value="🌤️ Tarde (12h–18h)"> 🌤️ Tarde (12h–18h)</label>
+            <label class="ci"><input type="checkbox" name="disp" value="🌙 Noite (18h–00h)"> 🌙 Noite (18h–00h)</label>
+            <label class="ci"><input type="checkbox" name="disp" value="🌑 Madrugada (00h–6h)"> 🌑 Madrugada (00h–6h)</label>
+            <label class="ci"><input type="checkbox" name="disp" value="📅 Fins de semana"> 📅 Fins de semana</label>
+            <label class="ci"><input type="checkbox" name="disp" value="📆 Dias de semana"> 📆 Dias de semana</label>
           </div>
         </div>
 
-        <!-- Nível de Experiência -->
-        <div class="form-group full">
-          <label>Nível de Experiência *</label>
-          <div class="radio-group" id="nivelExp">
-            <label class="radio-item"><input type="radio" name="exp" value="🌱 Iniciante (menos de 3 meses)"> 🌱 Iniciante (menos de 3 meses)</label>
-            <label class="radio-item"><input type="radio" name="exp" value="⚔️ Intermediário (3-6 meses)"> ⚔️ Intermediário (3-6 meses)</label>
-            <label class="radio-item"><input type="radio" name="exp" value="🏆 Avançado (6-12 meses)"> 🏆 Avançado (6-12 meses)</label>
-            <label class="radio-item"><input type="radio" name="exp" value="👑 Veterano (mais de 1 ano)"> 👑 Veterano (mais de 1 ano)</label>
-            <label class="radio-item"><input type="radio" name="exp" value="🌟 Lenda (Fundador/mais de 2 anos)"> 🌟 Lenda (Fundador/mais de 2 anos)</label>
-          </div>
-          <span class="err" id="err-exp">Selecione seu nível.</span>
+        <!-- HABILIDADES -->
+        <div class="fg full">
+          <label class="fl">Habilidades Especiais</label>
+          <div class="cgrid" id="habs"></div>
         </div>
 
-        <!-- Disponibilidade -->
-        <div class="form-group full">
-          <label>Disponibilidade</label>
-          <div class="checkboxes-grid">
-            <label class="check-item"><input type="checkbox" name="disp" value="☀️ Manhã (6h-12h)"> ☀️ Manhã (6h-12h)</label>
-            <label class="check-item"><input type="checkbox" name="disp" value="🌤️ Tarde (12h-18h)"> 🌤️ Tarde (12h-18h)</label>
-            <label class="check-item"><input type="checkbox" name="disp" value="🌙 Noite (18h-00h)"> 🌙 Noite (18h-00h)</label>
-            <label class="check-item"><input type="checkbox" name="disp" value="🌑 Madrugada (00h-6h)"> 🌑 Madrugada (00h-6h)</label>
-            <label class="check-item"><input type="checkbox" name="disp" value="📅 Fins de semana"> 📅 Fins de semana</label>
-            <label class="check-item"><input type="checkbox" name="disp" value="📆 Dias de semana"> 📆 Dias de semana</label>
-          </div>
+        <!-- MENSAGEM -->
+        <div class="fg full">
+          <label class="fl" for="msg">Mensagem para o Líder *</label>
+          <textarea id="msg" placeholder="Escreva por que você merece esse cargo e o que pode contribuir para a Constelação Sangrenta..." required></textarea>
+          <span class="err" id="e-msg">Escreva uma mensagem.</span>
         </div>
 
-        <!-- Habilidades -->
-        <div class="form-group full">
-          <label>Habilidades Especiais</label>
-          <div class="checkboxes-grid" id="habilidades">
-          </div>
+        <!-- LINK -->
+        <div class="fg full">
+          <label class="fl" for="link">Link do Perfil Hago</label>
+          <input type="url" id="link" placeholder="https://...">
         </div>
 
-        <!-- Mensagem -->
-        <div class="form-group full">
-          <label for="mensagem">Mensagem para o Líder *</label>
-          <textarea id="mensagem" rows="5" placeholder="Escreva aqui por que você merece esse cargo e o que pode contribuir para a Constelação Sangrenta..." required></textarea>
-          <span class="err" id="err-mensagem">Escreva uma mensagem.</span>
-        </div>
-
-        <!-- Link perfil -->
-        <div class="form-group full">
-          <label for="linkPerfil">Link do Perfil Hago</label>
-          <input type="url" id="linkPerfil" placeholder="https://...">
-        </div>
-
-        <!-- Confirmação -->
-        <div class="form-group full">
-          <label class="confirm-item" id="confirmLabel">
-            <input type="checkbox" id="confirmCheck">
-            <span>✅ Juro por minha lealdade à Constelação Sangrenta que todas as informações são verdadeiras e aceito as regras da TAG.</span>
+        <!-- JURAMENTO -->
+        <div class="fg full">
+          <label class="oath" id="oathLbl">
+            <input type="checkbox" id="oath">
+            <span>✅ Juro por minha lealdade à Constelação Sangrenta que todas as informações são verdadeiras e que aceito todas as regras da TAG.</span>
           </label>
-          <span class="err" id="err-confirm">Você precisa confirmar o juramento.</span>
+          <span class="err" id="e-oath">Você precisa confirmar o juramento de lealdade.</span>
         </div>
 
-      </div><!-- /form-grid -->
+      </div><!-- /fgrid -->
 
-      <button type="submit" class="btn-submit" id="btnSubmit">
-        <div class="spinner" id="spinner"></div>
-        <span id="btnText">⚔️ REGISTRAR MEU CARGO NA CSL ⚔️</span>
+      <button type="submit" class="btn-sub" id="btnSub">
+        <span>
+          <div class="spin" id="spin"></div>
+          <span id="btnTxt">⚔ REGISTRAR MEU CARGO NA CSL ⚔</span>
+        </span>
       </button>
-
     </form>
   </div>
 </section>
@@ -955,138 +1121,90 @@ footer span{color:var(--red)}
 <hr class="sep">
 
 <!-- STATS -->
-<div class="stats-strip reveal" id="sobre-stats">
-  <span class="stat-num" id="memberCounter">0</span>
-  <span class="stat-label">MEMBROS NA FAMÍLIA</span>
+<div class="stats-strip rv2">
+  <span class="snum" id="cnt">0</span>
+  <span class="slbl">// MEMBROS NA FAMÍLIA //</span>
 </div>
 
 <hr class="sep">
 
 <!-- SOBRE -->
-<section id="sobre">
-  <h2 class="section-title reveal">🌌 SOBRE A CSL 🌌</h2>
-  <div class="about-text reveal">
-    <p>
-      A <strong>Constelação Sangrenta</strong> — conhecida como <strong>CSL</strong> — é uma das TAGs mais temidas e respeitadas do Hago. Fundada sob o signo do sangue e da lealdade, nossa família Prata carrega o peso de guerreiros verdadeiros que lutam com honra, disciplina e coração.</p>
-    <br>
-    <p>Aqui não há espaço para covardes ou traidores. <strong>Cada membro é uma estrela</strong> dessa constelação, e juntos formamos algo maior: uma força imparável, uma família unida pelo mesmo sangue e pelo mesmo propósito.</p>
-    <br>
-    <p>Sob a liderança de <strong>jdp120453</strong>, a CSL cresce com propósito, seleciona com rigor e pune com justiça. Se você chegou até aqui, é porque algo dentro de você quer fazer parte de algo <strong>lendário</strong>.</p>
-    <br>
-    <p style="color:var(--red);font-size:1.2rem;font-weight:700;letter-spacing:.1em">🩸 UMA VEZ CSL, SEMPRE CSL 🩸</p>
+<section class="sec" id="sobre">
+  <h2 class="stitle rv" data-num="03">SOBRE A <em>CSL</em>
+    <div class="stitle-line"><span></span></div>
+  </h2>
+  <div class="about-wrap">
+    <p class="rv">A <strong>Constelação Sangrenta — CSL</strong> é uma das TAGs mais temidas e respeitadas do Hago. Fundada sob o signo do sangue e da lealdade absoluta, nossa <strong>Família Prata</strong> carrega o peso de guerreiros verdadeiros: jogadores que lutam com honra, disciplina e coração.</p>
+    <div class="blood-quote rv">UMA VEZ CSL, SEMPRE CSL.</div>
+    <p class="rv">Aqui não existe espaço para covardes, traidores ou indecisos. <strong>Cada membro é uma estrela</strong> dessa constelação — e juntos formamos algo maior que qualquer um de nós: uma força imparável, uma família unida pelo mesmo sangue e o mesmo propósito.</p>
+    <p class="rv">Sob a liderança de <strong>jdp120453</strong>, a CSL cresce com propósito, seleciona com rigor e pune com justiça. Se você chegou até aqui, é porque algo dentro de você reconhece o chamado. <strong>Prove que merece.</strong></p>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <p><span>✦ CONSTELAÇÃO SANGRENTA ✦</span></p>
-  <p style="margin-top:8px">© Constelação Sangrenta — Família Prata — Hago</p>
-  <p style="margin-top:4px;font-size:.75rem">x ʟcs ƨʌɴɢʀεɴтʌ˥ x &nbsp;|&nbsp; jdp120453 &nbsp;|&nbsp; 71 Membros</p>
+  <span class="f-emblem">CSL</span>
+  <p><strong>✦ CONSTELAÇÃO SANGRENTA ✦</strong></p>
+  <p>© Constelação Sangrenta — Família Prata — Hago</p>
+  <p>x ʟcs ƨʌɴɢʀεɴтʌ˥ x &nbsp;·&nbsp; Líder: jdp120453 &nbsp;·&nbsp; 71 Membros</p>
+  <p style="margin-top:16px;font-size:.6rem;color:rgba(100,50,50,0.4)">//END OF LINE//</p>
 </footer>
 
 </div><!-- /wrapper -->
 
 <script>
-/* ═══════════════════════════════════════════
-   STAR CANVAS
-═══════════════════════════════════════════ */
+/* ─── INTRO ─── */
 (function(){
-  const canvas=document.getElementById('starCanvas');
-  const ctx=canvas.getContext('2d');
-  let W,H,stars=[];
-  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
-  function makeStars(){
-    stars=[];
-    const n=Math.floor((W*H)/8000);
-    for(let i=0;i<n;i++){
-      const r=Math.random();
-      stars.push({
-        x:Math.random()*W,y:Math.random()*H,
-        r:Math.random()*1.5+0.3,
-        alpha:Math.random(),
-        speed:Math.random()*0.3+0.05,
-        twinkle:Math.random()*0.02+0.005,
-        dir:Math.random()<0.5?1:-1,
-        // some red/gold
-        hue:r<0.05?'rgba(255,100,100,':'rgba(255,255,255,'
-      });
-    }
+  let p=0;const el=document.getElementById('pct');
+  const t=setInterval(()=>{
+    p+=Math.floor(Math.random()*12)+3;
+    if(p>=100){p=100;clearInterval(t)}
+    el.textContent='['+p+'%] INICIALIZANDO SISTEMA...';
+  },80);
+})();
+function enterSite(){document.getElementById('intro').classList.add('gone')}
+
+/* ─── BG CANVAS ─── */
+(function(){
+  const c=document.getElementById('bgCanvas');
+  const ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  function init(){
+    pts=[];const n=Math.floor(W*H/7000);
+    for(let i=0;i<n;i++)pts.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:Math.random()*1.2+.2,
+      a:Math.random(),da:(Math.random()*.012+.003)*(Math.random()<.5?1:-1),
+      vy:Math.random()*.15+.03,
+      c:Math.random()<.07?'rgba(204,0,0,':'rgba(240,240,240,'
+    });
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
-    for(const s of stars){
-      s.alpha+=s.twinkle*s.dir;
-      if(s.alpha>1||s.alpha<0.1)s.dir*=-1;
-      s.y+=s.speed;
-      if(s.y>H)s.y=0;
-      ctx.beginPath();
-      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle=s.hue+s.alpha+')';
-      ctx.fill();
+    for(const p of pts){
+      p.a+=p.da;if(p.a>1||p.a<.05)p.da*=-1;
+      p.y+=p.vy;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c+Math.max(0,Math.min(1,p.a))+')';ctx.fill();
     }
     requestAnimationFrame(draw);
   }
-  resize();makeStars();draw();
-  window.addEventListener('resize',()=>{resize();makeStars()});
+  resize();init();draw();
+  window.addEventListener('resize',()=>{resize();init()});
 })();
 
-/* ═══════════════════════════════════════════
-   BLOOD DROPS
-═══════════════════════════════════════════ */
+/* ─── BLOOD DRIPS ─── */
 (function(){
-  const c=document.getElementById('bloodContainer');
-  for(let i=0;i<18;i++){
-    const d=document.createElement('div');
-    d.className='drop';
-    const h=Math.floor(Math.random()*20)+6;
-    d.style.cssText=`
-      left:${Math.random()*100}%;
-      height:${h}px;
-      width:${Math.floor(h/4)+2}px;
-      animation-duration:${(Math.random()*6+4).toFixed(1)}s;
-      animation-delay:${(Math.random()*8).toFixed(1)}s;
-      opacity:0;
-    `;
+  const c=document.getElementById('drips');
+  for(let i=0;i<20;i++){
+    const d=document.createElement('div');d.className='drip';
+    const h=Math.floor(Math.random()*30)+10;
+    d.style.cssText=`left:${Math.random()*100}%;width:${Math.floor(h/5)+2}px;height:${h}px;animation-duration:${(Math.random()*8+5).toFixed(1)}s;animation-delay:${(Math.random()*10).toFixed(1)}s`;
     c.appendChild(d);
   }
 })();
 
-/* ═══════════════════════════════════════════
-   MEMBER COUNTER ANIMATION
-═══════════════════════════════════════════ */
-function animateCounter(el,target){
-  let cur=0;
-  const step=Math.ceil(target/60);
-  const t=setInterval(()=>{
-    cur+=step;
-    if(cur>=target){cur=target;clearInterval(t)}
-    el.textContent=cur;
-  },25);
-}
-const counterEl=document.getElementById('memberCounter');
-const io=new IntersectionObserver(entries=>{
-  if(entries[0].isIntersecting){animateCounter(counterEl,71);io.disconnect()}
-},{threshold:0.5});
-io.observe(counterEl);
-
-/* ═══════════════════════════════════════════
-   POPULATE CHECKBOXES
-═══════════════════════════════════════════ */
-const funcoesSecList=[
-  'Organizar eventos','Recrutar membros','Treinar novatos','Vigiar o chat',
-  'Fazer check-in diário','Divulgar a TAG','Criar conteúdo','Moderar conflitos',
-  'Animar reuniões','Fazer relatórios','Controlar presença','Gerenciar convites',
-  'Avaliar candidatos','Aplicar regras','Premiar membros','Narrar torneios',
-  'Editar vídeos','Gerenciar redes sociais','Fazer anúncios','Criar designs',
-  'Investigar tretas','Aplicar advertências','Proteger segredos da TAG',
-  'Negociar alianças','Representar externamente','Fazer transmissões ao vivo',
-  'Comentar partidas','Fotografar eventos','Arquivar dados','Monitorar atividade',
-  'Atualizar quadro','Remover inativos','Agendar reuniões','Criar estratégias',
-  'Liderar batalhas','Defender aliados','Scout de rivais','Criar formações',
-  'Dar feedback','Planejar sessões','Orientar membros','Resolver dúvidas',
-  'Mediar conversas','Suporte emocional','Animar o grupo','Criar memes',
-  'Fazer sorteios','Distribuir prêmios','Controlar recursos','Avaliar desempenho'
-];
+/* ─── HABILIDADES ─── */
 const habList=[
   'Boa comunicação','Liderança natural','Resolução de conflitos','Criatividade',
   'Design gráfico','Edição de vídeo','Gerenciamento de pessoas','Estratégia de jogo',
@@ -1094,102 +1212,116 @@ const habList=[
   'Lealdade comprovada','Dedicação','Conhecimento das regras','Experiência com TAGs',
   'Habilidade em torneios','Transmissão ao vivo','Gestão de redes sociais',
   'Criação de conteúdo','Análise de gameplay','Motivação da equipe','Escrita criativa',
-  'Gestão financeira','Controle emocional','Paciência','Disciplina','Comprometimento',
-  'Proatividade','Trabalho em equipe','Autonomia','Bom humor','Carisma','Empatia'
+  'Controle emocional','Paciência','Disciplina','Comprometimento',
+  'Proatividade','Trabalho em equipe','Autonomia','Bom humor','Carisma','Empatia',
+  'Sigilo e discrição','Inteligência tática','Programação','Investigação'
 ];
-function buildCheckboxes(parentId,list,nameAttr){
-  const p=document.getElementById(parentId);
-  list.forEach(v=>{
-    const lbl=document.createElement('label');
-    lbl.className='check-item';
-    lbl.innerHTML=`<input type="checkbox" name="${nameAttr}" value="${v}"> ${v}`;
-    p.appendChild(lbl);
+(function(){
+  const p=document.getElementById('habs');
+  habList.forEach(v=>{
+    const l=document.createElement('label');l.className='ci';
+    l.innerHTML=`<input type="checkbox" name="hab" value="${v}"> ${v}`;
+    p.appendChild(l);
+  });
+})();
+
+/* ─── FUNÇÕES (max 3) ─── */
+let selectedFuncs=[];
+function addFunc(sel){
+  const v=sel.value;if(!v)return;
+  if(selectedFuncs.includes(v)){sel.value='';return}
+  if(selectedFuncs.length>=3){
+    alert('Máximo de 3 funções atingido. Remova uma antes de adicionar outra.');
+    sel.value='';return;
+  }
+  selectedFuncs.push(v);
+  renderFuncTags();
+  sel.value='';
+  updateFuncHidden();
+  if(selectedFuncs.length>=3)sel.disabled=true;
+}
+function removeFunc(v){
+  selectedFuncs=selectedFuncs.filter(f=>f!==v);
+  document.getElementById('funcSel').disabled=false;
+  renderFuncTags();
+  updateFuncHidden();
+}
+function renderFuncTags(){
+  const c=document.getElementById('funcTags');c.innerHTML='';
+  selectedFuncs.forEach(v=>{
+    const d=document.createElement('div');d.className='ftag';
+    d.innerHTML=`${v}<button type="button" onclick="removeFunc('${v.replace(/'/g,"\\'")}')">✕</button>`;
+    c.appendChild(d);
   });
 }
-buildCheckboxes('funcoesSecundarias',funcoesSecList,'funcSec');
-buildCheckboxes('habilidades',habList,'hab');
+function updateFuncHidden(){document.getElementById('funcHidden').value=selectedFuncs.join(' | ')}
 
-/* ═══════════════════════════════════════════
-   SCROLL REVEAL
-═══════════════════════════════════════════ */
-const revealObs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
-},{threshold:0.12});
-document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+/* ─── REVEAL ─── */
+const ro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1});
+document.querySelectorAll('.rv,.rv2').forEach(el=>ro.observe(el));
 
-/* ═══════════════════════════════════════════
-   FORM VALIDATION & SUBMIT
-═══════════════════════════════════════════ */
-function getChecked(name){
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i=>i.value);
-}
-function showErr(id,show){
-  const e=document.getElementById('err-'+id);
-  if(!e)return;
-  e.classList.toggle('show',show);
-}
-function markField(el,invalid){
-  el&&el.classList.toggle('invalid',invalid);
-}
+/* ─── COUNTER ─── */
+const cntEl=document.getElementById('cnt');
+const co=new IntersectionObserver(es=>{
+  if(es[0].isIntersecting){
+    let n=0;const t=setInterval(()=>{n+=2;if(n>=71){n=71;clearInterval(t)}cntEl.textContent=n},18);
+    co.disconnect();
+  }
+},{threshold:.5});
+co.observe(cntEl);
 
-document.getElementById('cargoForm').addEventListener('submit',async function(e){
+/* ─── FORM ─── */
+function setErr(id,show){
+  const e=document.getElementById('e-'+id);if(e)e.classList.toggle('on',show);
+}
+function setInv(el,inv){el&&el.classList.toggle('inv',inv)}
+
+document.getElementById('cslForm').addEventListener('submit',async function(e){
   e.preventDefault();
-  let valid=true;
+  let ok=true;
 
   const nick=document.getElementById('nick');
-  const hagoid=document.getElementById('hagoid');
+  const hid=document.getElementById('hid');
   const cargo=document.getElementById('cargo');
-  const funcao=document.getElementById('funcao');
-  const mensagem=document.getElementById('mensagem');
-  const confirm=document.getElementById('confirmCheck');
-  const expSelected=document.querySelector('input[name="exp"]:checked');
+  const msg=document.getElementById('msg');
+  const oath=document.getElementById('oath');
+  const expSel=document.querySelector('input[name="exp"]:checked');
 
-  const checks=[
-    [nick,!nick.value.trim(),'nick'],
-    [hagoid,!hagoid.value.trim(),'hagoid'],
-    [cargo,!cargo.value,'cargo'],
-    [funcao,!funcao.value,'funcao'],
-    [mensagem,!mensagem.value.trim(),'mensagem'],
-  ];
-  checks.forEach(([el,bad,id])=>{markField(el,bad);showErr(id,bad);if(bad)valid=false});
+  [[nick,'nick'],[hid,'hid'],[cargo,'cargo'],[msg,'msg']].forEach(([el,id])=>{
+    const bad=!el.value.trim();setInv(el,bad);setErr(id,bad);if(bad)ok=false;
+  });
+  if(selectedFuncs.length===0){setErr('func',true);ok=false}else setErr('func',false);
+  if(!expSel){setErr('exp',true);ok=false}else setErr('exp',false);
+  if(!oath.checked){setErr('oath',true);ok=false}else setErr('oath',false);
 
-  if(!expSelected){showErr('exp',true);valid=false}
-  else showErr('exp',false);
+  if(!ok){document.querySelector('.inv')?.scrollIntoView({behavior:'smooth',block:'center'});return}
 
-  if(!confirm.checked){showErr('confirm',true);valid=false}
-  else showErr('confirm',false);
-
-  if(!valid)return;
-
-  // Loading
-  const btn=document.getElementById('btnSubmit');
-  const sp=document.getElementById('spinner');
-  const bt=document.getElementById('btnText');
+  const btn=document.getElementById('btnSub');
+  const sp=document.getElementById('spin');
+  const bt=document.getElementById('btnTxt');
   btn.disabled=true;sp.style.display='block';bt.textContent='ENVIANDO...';
 
-  const disps=getChecked('disp');
-  const funcsSec=getChecked('funcSec');
-  const habs=getChecked('hab');
+  const disps=[...document.querySelectorAll('input[name="disp"]:checked')].map(i=>i.value);
+  const habs=[...document.querySelectorAll('input[name="hab"]:checked')].map(i=>i.value);
 
   const payload={
+    username:'CSL — Constelação Sangrenta',
     embeds:[{
       title:'⚔️ NOVO REGISTRO DE CARGO — CSL ⚔️',
       color:0xCC0000,
-      thumbnail:{url:'https://i.imgur.com/placeholder.png'},
       fields:[
-        {name:'👤 Nick no Hago',value:nick.value.trim(),inline:true},
-        {name:'🆔 ID no Hago',value:hagoid.value.trim(),inline:true},
-        {name:'📊 Nível',value:document.getElementById('nivel').value||'Não informado',inline:true},
+        {name:'👤 Nick no Hago',value:nick.value.trim()||'—',inline:true},
+        {name:'🆔 ID no Hago',value:hid.value.trim()||'—',inline:true},
+        {name:'📊 Nível',value:document.getElementById('nlvl').value||'Não informado',inline:true},
         {name:'🏆 Família/Rank',value:document.getElementById('familia').value||'Não informado',inline:true},
         {name:'⏳ Tempo na TAG',value:document.getElementById('tempo').value||'Não informado',inline:true},
-        {name:'👑 Cargo',value:cargo.value,inline:false},
-        {name:'🎯 Função Principal',value:funcao.value,inline:false},
-        {name:'📌 Funções Secundárias',value:funcsSec.length?funcsSec.join(', '):'Nenhuma selecionada',inline:false},
-        {name:'⚡ Nível de Experiência',value:expSelected.value,inline:true},
+        {name:'👑 Cargo Solicitado',value:cargo.value,inline:false},
+        {name:'🎯 Funções Escolhidas',value:selectedFuncs.join('\n')||'—',inline:false},
+        {name:'⚡ Nível de Experiência',value:expSel?expSel.value:'Não informado',inline:true},
         {name:'🕐 Disponibilidade',value:disps.length?disps.join(', '):'Não informado',inline:false},
-        {name:'💡 Habilidades',value:habs.length?habs.join(', '):'Nenhuma selecionada',inline:false},
-        {name:'📝 Mensagem para o Líder',value:mensagem.value.trim(),inline:false},
-        {name:'🔗 Perfil Hago',value:document.getElementById('linkPerfil').value||'Não informado',inline:false},
+        {name:'💡 Habilidades',value:habs.length?habs.join(', '):'Nenhuma',inline:false},
+        {name:'📝 Mensagem ao Líder',value:msg.value.trim().substring(0,1024),inline:false},
+        {name:'🔗 Perfil Hago',value:document.getElementById('link').value||'Não informado',inline:false},
       ],
       footer:{text:'x ʟcs ƨʌɴɢʀεɴтʌ˥ x • Constelação Sangrenta • Hago'},
       timestamp:new Date().toISOString()
@@ -1202,92 +1334,65 @@ document.getElementById('cargoForm').addEventListener('submit',async function(e)
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
     });
-    if(r.ok||r.status===204){
-      showSuccess();
-      document.getElementById('cargoForm').reset();
-    }else{
-      alert('Erro ao enviar: '+r.status+'. Tente novamente.');
-    }
+    if(r.ok||r.status===204){showSuccess();document.getElementById('cslForm').reset();selectedFuncs=[];renderFuncTags();updateFuncHidden();document.getElementById('funcSel').disabled=false}
+    else alert('Erro ao enviar ('+r.status+'). Tente novamente.');
   }catch(err){
-    alert('Erro de conexão. Verifique sua internet e tente novamente.');
-    console.error(err);
+    alert('Erro de conexão. Verifique sua internet.');
   }finally{
-    btn.disabled=false;sp.style.display='none';bt.textContent='⚔️ REGISTRAR MEU CARGO NA CSL ⚔️';
+    btn.disabled=false;sp.style.display='none';bt.textContent='⚔ REGISTRAR MEU CARGO NA CSL ⚔';
   }
 });
 
-/* ═══════════════════════════════════════════
-   SUCCESS + CONFETTI
-═══════════════════════════════════════════ */
-function showSuccess(){
-  document.getElementById('successModal').classList.add('show');
-  startConfetti();
-  setTimeout(stopConfetti,4500);
-}
-function closeModal(){
-  document.getElementById('successModal').classList.remove('show');
-  stopConfetti();
-}
-
-let confettiAnim;
-const confCanvas=document.getElementById('confettiCanvas');
-const confCtx=confCanvas.getContext('2d');
-let confetti=[];
-
-function startConfetti(){
-  confCanvas.width=window.innerWidth;
-  confCanvas.height=window.innerHeight;
-  confCanvas.style.display='block';
-  confetti=[];
-  for(let i=0;i<120;i++){
-    const colors=['#cc0000','#ff0000','#ffd700','#ff6666','#ffaa00','#fff'];
-    confetti.push({
-      x:Math.random()*confCanvas.width,
-      y:Math.random()*-200-20,
-      w:Math.random()*10+4,
-      h:Math.random()*6+3,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      rot:Math.random()*360,
-      rotS:Math.random()*6-3,
-      vx:Math.random()*4-2,
-      vy:Math.random()*4+2,
-      alpha:1
-    });
-  }
-  animConf();
-}
-function animConf(){
-  confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
-  confetti.forEach(p=>{
-    p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotS;p.alpha-=0.004;
-    if(p.y>confCanvas.height)p.y=-20;
-    confCtx.save();
-    confCtx.globalAlpha=Math.max(0,p.alpha);
-    confCtx.translate(p.x,p.y);
-    confCtx.rotate(p.rot*Math.PI/180);
-    confCtx.fillStyle=p.color;
-    confCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
-    confCtx.restore();
-  });
-  confettiAnim=requestAnimationFrame(animConf);
-}
-function stopConfetti(){
-  cancelAnimationFrame(confettiAnim);
-  confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);
-  confCanvas.style.display='none';
-}
-
-/* Real-time clear invalid on input */
-['nick','hagoid','cargo','funcao','mensagem'].forEach(id=>{
+/* clear errors on input */
+['nick','hid','cargo','msg'].forEach(id=>{
   const el=document.getElementById(id);
   if(!el)return;
-  el.addEventListener('input',()=>{markField(el,false);showErr(id,false)});
-  el.addEventListener('change',()=>{markField(el,false);showErr(id,false)});
+  ['input','change'].forEach(ev=>el.addEventListener(ev,()=>{setInv(el,false);setErr(id,false)}));
 });
-document.querySelectorAll('input[name="exp"]').forEach(r=>{
-  r.addEventListener('change',()=>showErr('exp',false));
-});
-document.getElementById('confirmCheck').addEventListener('change',()=>showErr('confirm',false));
+document.querySelectorAll('input[name="exp"]').forEach(r=>r.addEventListener('change',()=>setErr('exp',false)));
+document.getElementById('oath').addEventListener('change',()=>setErr('oath',false));
+
+/* ─── SUCCESS ─── */
+function showSuccess(){
+  document.getElementById('modal').classList.add('on');
+  startConfetti();
+  setTimeout(stopConfetti,5000);
+}
+function closeM(){document.getElementById('modal').classList.remove('on');stopConfetti()}
+
+/* ─── CONFETTI ─── */
+const cfxC=document.getElementById('cfx');const cfxX=cfxC.getContext('2d');
+let cfParts=[],cfAnim;
+function startConfetti(){
+  cfxC.width=innerWidth;cfxC.height=innerHeight;cfxC.style.display='block';
+  cfParts=[];
+  for(let i=0;i<150;i++){
+    const cols=['#cc0000','#ff0000','#ffd700','#ff6666','#ffcc00','#ffffff','#8b0000'];
+    cfParts.push({
+      x:Math.random()*cfxC.width,y:Math.random()*-300,
+      w:Math.random()*10+4,h:Math.random()*5+2,
+      c:cols[Math.floor(Math.random()*cols.length)],
+      rot:Math.random()*360,rs:Math.random()*6-3,
+      vx:Math.random()*3-1.5,vy:Math.random()*4+1.5,a:1
+    });
+  }
+  animCfx();
+}
+function animCfx(){
+  cfxX.clearRect(0,0,cfxC.width,cfxC.height);
+  for(const p of cfParts){
+    p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;p.a-=.005;
+    if(p.y>cfxC.height)p.y=-10;
+    cfxX.save();
+    cfxX.globalAlpha=Math.max(0,p.a);
+    cfxX.translate(p.x,p.y);cfxX.rotate(p.rot*Math.PI/180);
+    cfxX.fillStyle=p.c;
+    cfxX.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    cfxX.restore();
+  }
+  cfAnim=requestAnimationFrame(animCfx);
+}
+function stopConfetti(){cancelAnimationFrame(cfAnim);cfxX.clearRect(0,0,cfxC.width,cfxC.height);cfxC.style.display='none'}
 </script>
 </body>
 </html>
